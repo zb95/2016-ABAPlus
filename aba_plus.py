@@ -4,7 +4,10 @@ LESS_THAN = 1
 LESS_EQUAL = 2
 NO_RELATION = 3
 
+CANNOT_BE_DERIVED = -1
+
 class ABA_Plus:
+    #TODO: preference transitivity
     def __init__(self, assumptions=set(), preferences=set(), rules=set()):
         self.assumptions = assumptions
         self.preferences = preferences
@@ -64,31 +67,45 @@ class ABA_Plus:
         return False
 
     def check_WCP(self):
+        violation_found = False
         for assump in self.assumptions:
             att_rules = self.attacking_rules(assump)
             for rule in att_rules:
                 for contradictor in rule.antecedent:
-                    if not self.preference_check(assump, contradictor, rule.antecedent, set()):
-                        return False
-        return True
+                    result = self.preference_check(assump, contradictor, rule.antecedent, set())
+                    if result == False:
+                        violation_found = True
+                    elif result == CANNOT_BE_DERIVED:
+                        return True
+        return not violation_found
 
     def preference_check(self, assumption, contradictor, antecedent, sentences_seen):
-        if self.is_preferred(assumption, contradictor) and \
+        if contradictor in self.assumptions and \
+           self.is_preferred(assumption, contradictor) and \
            not self.WCP_fulfilled(contradictor, assumption, antecedent):
             return False
         elif contradictor not in self.assumptions:
-            sentences_seen.add(contradictor)
             der_rules = self.deriving_rules(contradictor)
+            if not der_rules:
+                return CANNOT_BE_DERIVED
+            sentences_seen.add(contradictor)
             for rule in der_rules:
+                violation_found = False
                 for ant in rule.antecedent:
-                    if ant not in sentences_seen and \
-                       not self.preference_check(assumption, ant, rule.antecedent, set()):
-                        return False
+                    if ant not in sentences_seen:
+                        result =  self.preference_check(assumption, ant, rule.antecedent, set())
+                        if result == False:
+                            violation_found = True
+                        elif result == CANNOT_BE_DERIVED:
+                            violation_found = False
+                            break
+                if violation_found == True:
+                    return False
         return True
 
 
 class Rule:
-    def __init__(self, antecedent=None, consequent=None):
+    def __init__(self, antecedent=set(), consequent=None):
         self.antecedent = antecedent
         self.consequent = consequent
 
