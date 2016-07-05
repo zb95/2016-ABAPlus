@@ -168,3 +168,21 @@ class TestABAPlus(unittest.TestCase):
         abap = ABA_Plus(assumptions=assumptions, preferences=preferences, rules=rules)
 
         self.assertFalse(abap.check_WCP())
+
+    def test_cycle_WCP_violation_check(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        c = Predicate("c")
+        assumptions = set([a, b])
+
+        pref = Preference(b, a, LESS_THAN)
+        preferences = set([pref])
+
+        rule1 = Rule(set([c]), a.contrary())
+        rule2 = Rule(set([c]), c)
+        rule3 = Rule(set([b]), c)
+        rules = (set([rule1, rule2, rule3]))
+
+        abap = ABA_Plus(assumptions=assumptions, preferences=preferences, rules=rules)
+
+        self.assertFalse(abap.check_WCP())
