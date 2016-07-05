@@ -13,13 +13,13 @@ class ABA_Plus:
     def __str__(self):
         return str(self.__dict__)
 
-    def attacking_rules(self, assumption):
-        return self.deriving_rules(assumption.contrary())
+    def attacking_rules(self, sentence):
+        return self.deriving_rules(sentence.contrary())
 
-    def deriving_rules(self, assumption):
+    def deriving_rules(self, sentence):
         der_rules = set()
         for rule in self.rules:
-            if rule.consequent == assumption:
+            if rule.consequent == sentence:
                 der_rules.add(rule)
         return der_rules
 
@@ -68,19 +68,21 @@ class ABA_Plus:
             att_rules = self.attacking_rules(assump)
             for rule in att_rules:
                 for contradictor in rule.antecedent:
-                    if not self.preference_check(assump, contradictor, rule.antecedent):
+                    if not self.preference_check(assump, contradictor, rule.antecedent, set()):
                         return False
         return True
 
-    def preference_check(self, assumption, contradictor, antecedent):
+    def preference_check(self, assumption, contradictor, antecedent, sentences_seen):
         if self.is_preferred(assumption, contradictor) and \
            not self.WCP_fulfilled(contradictor, assumption, antecedent):
             return False
         elif contradictor not in self.assumptions:
+            sentences_seen.add(contradictor)
             der_rules = self.deriving_rules(contradictor)
             for rule in der_rules:
                 for ant in rule.antecedent:
-                    if not self.preference_check(assumption, ant, rule.antecedent):
+                    if ant not in sentences_seen and \
+                       not self.preference_check(assumption, ant, rule.antecedent, set()):
                         return False
         return True
 
