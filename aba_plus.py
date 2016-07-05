@@ -14,7 +14,7 @@ class ABA_Plus:
         return str(self.__dict__)
 
     def attacking_rules(self, assumption):
-        return self.deriving_rules(assumption.negated())
+        return self.deriving_rules(assumption.contrary())
 
     def deriving_rules(self, assumption):
         der_rules = set()
@@ -33,7 +33,7 @@ class ABA_Plus:
         return self.get_relation(assump2, assump1) == LESS_THAN
 
     def WCP_fulfilled(self, contradictor, assumption, antecedent):
-        negated_contr = contradictor.negated()
+        negated_contr = contradictor.contrary()
         deduce_from = antecedent.copy()
         deduce_from.add(assumption)
         deduce_from.remove(contradictor)
@@ -115,7 +115,7 @@ class Predicate:
     def __hash__(self):
         return (self.symbol, self.is_negated).__hash__()
 
-    def negated(self):
+    def contrary(self):
         return Predicate(self.symbol, not self.is_negated)
 
 class Preference:

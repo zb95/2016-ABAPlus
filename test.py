@@ -98,8 +98,8 @@ class TestABAPlus(unittest.TestCase):
         b = Predicate("b")
         assumptions = set([a, b])
 
-        rule1 = Rule(set([b]), a.negated())
-        rule2 = Rule(set([a]), b.negated())
+        rule1 = Rule(set([b]), a.contrary())
+        rule2 = Rule(set([a]), b.contrary())
         rules = (set([rule1, rule2]))
 
         abap = ABA_Plus(assumptions=assumptions, rules=rules)
@@ -112,8 +112,8 @@ class TestABAPlus(unittest.TestCase):
         c = Predicate("c")
         assumptions = set([a, b, c])
 
-        rule1 = Rule(set([b]), a.negated())
-        rule2 = Rule(set([c]), b.negated())
+        rule1 = Rule(set([b]), a.contrary())
+        rule2 = Rule(set([c]), b.contrary())
         rules = (set([rule1, rule2]))
 
         abap = ABA_Plus(assumptions=assumptions, rules=rules)
@@ -128,7 +128,7 @@ class TestABAPlus(unittest.TestCase):
         pref = Preference(b, a, LESS_THAN)
         preferences = set([pref])
 
-        rule = Rule(set([b]), a.negated())
+        rule = Rule(set([b]), a.contrary())
         rules = (set([rule]))
 
         abap = ABA_Plus(assumptions=assumptions, preferences=preferences, rules=rules)
@@ -145,7 +145,24 @@ class TestABAPlus(unittest.TestCase):
         preferences = set([pref])
 
         rule1 = Rule(set([b]), c)
-        rule2 = Rule(set([c]), a.negated())
+        rule2 = Rule(set([c]), a.contrary())
+        rules = (set([rule1, rule2]))
+
+        abap = ABA_Plus(assumptions=assumptions, preferences=preferences, rules=rules)
+
+        self.assertFalse(abap.check_WCP())
+
+    def test_transitive_WCP_violation_check(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        c = Predicate("c")
+        assumptions = set([a, b])
+
+        pref = Preference(b, a, LESS_THAN)
+        preferences = set([pref])
+
+        rule1 = Rule(set([b]), c)
+        rule2 = Rule(set([c]), a.contrary())
         rules = (set([rule1, rule2]))
 
         abap = ABA_Plus(assumptions=assumptions, preferences=preferences, rules=rules)
