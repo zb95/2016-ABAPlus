@@ -212,7 +212,7 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertFalse(abap.check_WCP())
 
-    def test_complex_WCP_no_violation_check(self):
+    def test_complex_WCP_no_violation_check1(self):
         alpha = Predicate("alpha")
         beta = Predicate("beta")
         gamma = Predicate("gamma")
@@ -253,8 +253,7 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertTrue(abap.check_WCP())
 
-    '''
-    def test_WCP_cannot_be_derived_check(self):
+    def test_complex_WCP_no_violation_check2(self):
         alpha = Predicate("alpha")
         beta = Predicate("beta")
         gamma = Predicate("gamma")
@@ -274,4 +273,115 @@ class TestABAPlus(unittest.TestCase):
         x = Predicate("x")
         z = Predicate("z")
         assumptions = set([alpha, beta, gamma])
-    '''
+
+        rule1 = Rule(set([a, b, c]), x)
+        rule2 = Rule(set([s, t]), a)
+        rule3 = Rule(set([b]), s)
+        rule4 = Rule(set([beta, u]), b)
+        rule5 = Rule(set([]), u)
+        rule6 = Rule(set([v, z]), c)
+        rule7 = Rule(set([a]), z)
+        rule8 = Rule(set([v]), v)
+        rule9 = Rule(set([k, l]), c)
+        rule10 = Rule(set([k]), k)
+        rule11 = Rule(set([a]), l)
+        rule12 = Rule(set([a, m]), k)
+        rule13 = Rule(set([beta, n]), m)
+        rule14 = Rule(set([p]), n)
+        rule15 = Rule(set([b, q]), m)
+        rule16 = Rule(set([]), q)
+        rules = {rule1, rule2, rule3, rule3, rule4, rule5, rule6,
+                 rule7, rule8, rule9, rule10, rule11, rule12, rule13,
+                 rule14, rule15, rule16}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        self.assertTrue(abap.check_WCP())
+
+    def test_set_combinations(self):
+        abap = ABA_Plus()
+
+        set1 = set()
+        set1.add(frozenset({"b"}))
+
+        set2 = set()
+        set2.add(frozenset({"e"}))
+        set2.add(frozenset({"f"}))
+
+        set3 = set()
+        set3.add(frozenset({"g"}))
+
+        set4 = set()
+        set4.add(frozenset({"i"}))
+        set4.add(frozenset({"k"}))
+
+        combs = abap.set_combinations({frozenset(set1), frozenset(set2), frozenset(set3), frozenset(set4)})
+        correct_combs = {frozenset({"b", "e", "g", "i"}), frozenset({"b", "e", "g", "k"}),
+                         frozenset({"b", "f", "g", "i"}), frozenset({"b", "f", "g", "k"})}
+        self.assertEqual(combs, correct_combs)
+
+    def test_simple_generate_argument1(self):
+        a = Predicate("a")
+        assumptions = set([a])
+
+
+        abap = ABA_Plus(assumptions=assumptions)
+
+        res = abap.generate_arguments(a)
+
+        self.assertEqual(abap.generate_arguments(a), {frozenset({a})})
+
+    def test_simple_generate_argument2(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        c = Predicate("c")
+        assumptions = set([b,c])
+
+        rule = Rule(set([b, c]), a)
+        rules = (set([rule]))
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        res = abap.generate_arguments(a)
+
+        self.assertEqual(abap.generate_arguments(a), {frozenset({b,c})})
+
+    def test_transitive_generate_argument(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        c = Predicate("c")
+        d = Predicate("d")
+        e = Predicate("e")
+        assumptions = set([b, c, d])
+
+        rule1 = Rule(set([b, e]), a)
+        rule2 = Rule(set([c, d]), e)
+        rules = (set([rule1, rule2]))
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        self.assertEqual(abap.generate_arguments(a), {frozenset({b, c, d})})
+
+    def test_generate_multiple_arguments(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        c = Predicate("c")
+        d = Predicate("d")
+        e = Predicate("e")
+        assumptions = set([b, d, e])
+
+        rule1 = Rule(set([b, c]), a)
+        rule2 = Rule(set([d]), c)
+        rule3 = Rule(set([e]), c)
+        rules = (set([rule1, rule2, rule3]))
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        self.assertEqual(abap.generate_arguments(a), {frozenset({b, d}), frozenset({b, e})})
+
+    #test_empty_antecedent
+
+    #test_cycle
+
+
+
