@@ -111,7 +111,7 @@ class ABA_Plus:
                 violation_found = False
                 for ant in rule.antecedent:
                     if ant not in sentences_seen:
-                        result =  self.preference_check(assumption, ant, rule.antecedent, set())
+                        result =  self.preference_check(assumption, ant, rule.antecedent, sentences_seen.copy())
                         if result == False:
                             violation_found = True
                         elif result == CANNOT_BE_DERIVED:
@@ -121,7 +121,7 @@ class ABA_Plus:
                     return False
         return True
 
-    def generate_arguments(self, generate_for):
+    def generate_arguments(self, generate_for, sentences_seen = set()):
         if generate_for in self.assumptions:
             return {frozenset({generate_for})}
         der_rules = self.deriving_rules(generate_for)
@@ -133,7 +133,8 @@ class ABA_Plus:
                 empty_set.add(frozenset())
                 supporting_assumptions.add(frozenset(empty_set))
             for ant in rule.antecedent:
-                supporting_assumptions.add(frozenset(self.generate_arguments(ant)))
+                sentences_seen.add(ant)
+                supporting_assumptions.add(frozenset(self.generate_arguments(ant, sentences_seen)))
 
             results = results.union(self.set_combinations(supporting_assumptions))
         return results
