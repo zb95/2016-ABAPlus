@@ -66,6 +66,24 @@ class ABA_Plus:
                 return True
         return False
 
+    def set_combinations(self, iterable):
+        return self._set_combinations(iter(iterable))
+
+    def _set_combinations(self, iter):
+        current_set = next(iter, None)
+        if current_set is not None:
+            sets_to_combine_with = self._set_combinations(iter)
+            resulting_combinations = set()
+            for c in current_set:
+                if not sets_to_combine_with:
+                    resulting_combinations.add(frozenset(c))
+                for s in sets_to_combine_with:
+                    resulting_combinations.add(frozenset(c.union(s)))
+
+            return resulting_combinations
+
+        return set()
+
     def check_WCP(self):
         violation_found = False
         for assump in self.assumptions:
@@ -110,29 +128,17 @@ class ABA_Plus:
         results = set()
         for rule in der_rules:
             supporting_assumptions = set()
+            if not rule.antecedent:
+                empty_set = set()
+                empty_set.add(frozenset())
+                supporting_assumptions.add(frozenset(empty_set))
             for ant in rule.antecedent:
                 supporting_assumptions.add(frozenset(self.generate_arguments(ant)))
 
             results = results.union(self.set_combinations(supporting_assumptions))
         return results
 
-    def set_combinations(self, iterable):
-        return self._set_combinations(iter(iterable))
 
-    def _set_combinations(self, iter):
-        current_set = next(iter, None)
-        if current_set is not None:
-            sets_to_combine_with = self._set_combinations(iter)
-            resulting_combinations = set()
-            for c in current_set:
-                if not sets_to_combine_with:
-                    resulting_combinations.add(frozenset(c))
-                for s in sets_to_combine_with:
-                    resulting_combinations.add(frozenset(c.union(s)))
-
-            return resulting_combinations
-
-        return set()
 
 
 class Rule:
