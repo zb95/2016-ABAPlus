@@ -124,6 +124,7 @@ class ABA_Plus:
     def generate_arguments(self, generate_for, sentences_seen = set()):
         if generate_for in self.assumptions:
             return {frozenset({generate_for})}
+        sentences_seen.add(generate_for)
         der_rules = self.deriving_rules(generate_for)
         results = set()
         for rule in der_rules:
@@ -133,8 +134,8 @@ class ABA_Plus:
                 empty_set.add(frozenset())
                 supporting_assumptions.add(frozenset(empty_set))
             for ant in rule.antecedent:
-                sentences_seen.add(ant)
-                supporting_assumptions.add(frozenset(self.generate_arguments(ant, sentences_seen)))
+                if ant not in sentences_seen:
+                    supporting_assumptions.add(frozenset(self.generate_arguments(ant, sentences_seen.copy())))
 
             results = results.union(self.set_combinations(supporting_assumptions))
         return results
