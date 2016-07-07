@@ -121,23 +121,33 @@ class ABA_Plus:
                     return False
         return True
 
-    def generate_arguments(self, generate_for, sentences_seen = set()):
+    def generate_arguments(self, generate_for):
+        return self._generate_arguments(generate_for, set())
+
+    def _generate_arguments(self, generate_for, sentences_seen):
         if generate_for in self.assumptions:
             return {frozenset({generate_for})}
+
         sentences_seen.add(generate_for)
         der_rules = self.deriving_rules(generate_for)
         results = set()
         for rule in der_rules:
             supporting_assumptions = set()
+            args_lacking = False
             if not rule.antecedent:
                 empty_set = set()
                 empty_set.add(frozenset())
                 supporting_assumptions.add(frozenset(empty_set))
             for ant in rule.antecedent:
                 if ant not in sentences_seen:
-                    supporting_assumptions.add(frozenset(self.generate_arguments(ant, sentences_seen.copy())))
+                    args = self._generate_arguments(ant, sentences_seen.copy())
+                    if not args:
+                        args_lacking = True
+                        break
+                    supporting_assumptions.add(frozenset(args))
 
-            results = results.union(self.set_combinations(supporting_assumptions))
+            if not args_lacking:
+                results = results.union(self.set_combinations(supporting_assumptions))
         return results
 
 

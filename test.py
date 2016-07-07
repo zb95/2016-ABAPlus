@@ -307,7 +307,7 @@ class TestABAPlus(unittest.TestCase):
         rule14 = Rule(set([p]), n)
         rule15 = Rule(set([b, q]), m)
         rule16 = Rule(set([]), q)
-        rules = {rule1, rule2, rule3, rule3, rule4, rule5, rule6,
+        rules = {rule1, rule2, rule3, rule4, rule5, rule6,
                  rule7, rule8, rule9, rule10, rule11, rule12, rule13,
                  rule14, rule15, rule16}
 
@@ -391,6 +391,7 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b, c, d})})
 
+
     def test_generate_multiple_arguments1(self):
         a = Predicate("a")
         b = Predicate("b")
@@ -408,18 +409,6 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b, d}), frozenset({b, e})})
 
-    def test_generate_multiple_arguments2(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        assumptions = set([b])
-
-        rule1 = Rule(set([b]), a)
-        rule2 = Rule(set(), a)
-        rules = (set([rule1, rule2]))
-
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
-
-        self.assertEqual(abap.generate_arguments(a), {frozenset(), frozenset({b})})
 
     def test_generate_multiple_arguments2(self):
         a = Predicate("a")
@@ -433,6 +422,7 @@ class TestABAPlus(unittest.TestCase):
         abap = ABA_Plus(assumptions=assumptions, rules=rules)
 
         self.assertEqual(abap.generate_arguments(a), {frozenset(), frozenset({b})})
+
 
     def test_generate_multiple_arguments3(self):
         a = Predicate("a")
@@ -450,6 +440,7 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b}), frozenset({b, d})})
 
+
     def test_cycle_generate_argument1(self):
         a = Predicate("a")
         b = Predicate("b")
@@ -462,6 +453,7 @@ class TestABAPlus(unittest.TestCase):
         abap = ABA_Plus(assumptions=assumptions, rules=rules)
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b})})
+
 
     def test_cycle_generate_argument2(self):
         a = Predicate("a")
@@ -482,6 +474,7 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({e})})
 
+
     def test_generate_no_arguments(self):
         a = Predicate("a")
         b = Predicate("b")
@@ -493,8 +486,122 @@ class TestABAPlus(unittest.TestCase):
         abap = ABA_Plus(assumptions=assumptions, rules=rules)
 
         self.assertEqual(abap.generate_arguments(a), set())
-        
 
 
+
+    '''
+    def test_complex_generate_arguments1(self):
+        alpha = Predicate("alpha")
+        beta = Predicate("beta")
+        gamma = Predicate("gamma")
+        delta = Predicate("delta")
+        d = Predicate("d")
+        s1 = Predicate("s1")
+        s2 = Predicate("s2")
+        s3 = Predicate("s3")
+        s4 = Predicate("s4")
+        s5 = Predicate("s5")
+        s6 = Predicate("s6")
+        s7 = Predicate("s7")
+        assumptions = set([alpha, beta, gamma, delta])
+
+        rule1 = Rule(set([s3, s4]), d)
+        rule2 = Rule(set([s2]), s3)
+        rule3 = Rule(set([s1, beta]), s2)
+        rule4 = Rule(set([beta]), s1)
+        rule5 = Rule(set([s5, s6]), d)
+        rule6 = Rule(set([s7]), s5)
+        rule7 = Rule(set([alpha, beta, gamma]), s7)
+        rule8 = Rule(set([s2]), s6)
+        rule9 = Rule(set([s5]), s7)
+        rule10 = Rule(set([s2]), s1)
+        rules = {rule1, rule2, rule3, rule4, rule5,
+                 rule6, rule7, rule8, rule9, rule10, }
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        self.assertEqual(abap.generate_arguments(alpha), {frozenset({alpha})})
+        self.assertEqual(abap.generate_arguments(beta), {frozenset({beta})})
+        self.assertEqual(abap.generate_arguments(gamma), {frozenset({gamma})})
+        self.assertEqual(abap.generate_arguments(delta), {frozenset({delta})})
+        self.assertEqual(abap.generate_arguments(d), {frozenset({alpha, beta, gamma})})
+
+    '''
+
+    def test_complex_generate_arguments2(self):
+        alpha = Predicate("alpha")
+        beta = Predicate("beta")
+        gamma = Predicate("gamma")
+        delta = Predicate("delta")
+        epsilon = Predicate("epsilon")
+        d = Predicate("d")
+        s1 = Predicate("s1")
+        s2 = Predicate("s2")
+        s3 = Predicate("s3")
+        s4 = Predicate("s4")
+        s5 = Predicate("s5")
+        s6 = Predicate("s6")
+        s7 = Predicate("s7")
+        s8 = Predicate("s8")
+        s9 = Predicate("s9")
+        s10 = Predicate("s10")
+        assumptions = set([alpha, beta, gamma, delta, epsilon])
+
+        rule1 = Rule(set([alpha, beta]), s1)
+        rule2 = Rule(set(), s2)
+        rule3 = Rule(set([s1, s2]), s3)
+        rule4 = Rule(set([alpha, s3]), s4)
+        rule5 = Rule(set([s4, beta]), s5)
+        rule6 = Rule(set([s5, gamma]), s4)
+        rule7 = Rule(set([s4, s5, s6]), d)
+        rule8 = Rule(set([s7]), s6)
+        rule9 = Rule(set([gamma, s8]), s7)
+        rule10 = Rule(set([s9]), s8)
+        rule11 = Rule(set([s2, gamma]), s10)
+        rule12 = Rule(set([s10]), d)
+        rules = {rule1, rule2, rule3, rule4, rule5, rule6,
+                 rule7, rule8, rule9, rule10, rule11, rule12}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        self.assertEqual(abap.generate_arguments(alpha), {frozenset({alpha})})
+        self.assertEqual(abap.generate_arguments(beta), {frozenset({beta})})
+        self.assertEqual(abap.generate_arguments(gamma), {frozenset({gamma})})
+        self.assertEqual(abap.generate_arguments(delta), {frozenset({delta})})
+        self.assertEqual(abap.generate_arguments(epsilon), {frozenset({epsilon})})
+        self.assertEqual(abap.generate_arguments(d), {frozenset({gamma})})
+
+    def test_complex_generate_arguments3(self):
+        alpha = Predicate("alpha")
+        beta = Predicate("beta")
+        a = Predicate("a")
+        b = Predicate("b")
+        s1 = Predicate("s1")
+        s2 = Predicate("s2")
+        s3 = Predicate("s3")
+        s4 = Predicate("s4")
+        s5 = Predicate("s5")
+        s6 = Predicate("s6")
+        s7 = Predicate("s7")
+        assumptions = set([alpha, beta])
+
+        rule1 = Rule(set([s1]), a)
+        rule2 = Rule(set([s2, s3]), s1)
+        rule3 = Rule(set(), s2)
+        rule4 = Rule(set([s4]), s3)
+        rule5 = Rule(set(), s4)
+        rule6 = Rule(set([s5, s6]), b)
+        rule7 = Rule(set(), s5)
+        rule8 = Rule(set([beta]), s6)
+        rule9 = Rule(set([beta]), s7)
+
+        rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        self.assertEqual(abap.generate_arguments(alpha), {frozenset({alpha})})
+        self.assertEqual(abap.generate_arguments(beta), {frozenset({beta})})
+        self.assertEqual(abap.generate_arguments(a), {frozenset()})
+        self.assertEqual(abap.generate_arguments(b), {frozenset({beta})})
 
 
