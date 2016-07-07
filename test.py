@@ -346,6 +346,18 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b,c})})
 
+    def test_generate_empty_argument(self):
+        a = Predicate("a")
+
+        rule = Rule(set(), a)
+        rules = (set([rule]))
+
+        abap = ABA_Plus(rules=rules)
+
+        res = abap.generate_arguments(a)
+
+        self.assertEqual(abap.generate_arguments(a), {frozenset()})
+
     def test_transitive_generate_argument(self):
         a = Predicate("a")
         b = Predicate("b")
@@ -362,7 +374,7 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b, c, d})})
 
-    def test_generate_multiple_arguments(self):
+    def test_generate_multiple_arguments1(self):
         a = Predicate("a")
         b = Predicate("b")
         c = Predicate("c")
@@ -379,9 +391,60 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b, d}), frozenset({b, e})})
 
-    #test_empty_antecedent
+    def test_generate_multiple_arguments2(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        assumptions = set([b])
 
-    #test_cycle
+        rule1 = Rule(set([b]), a)
+        rule2 = Rule(set(), a)
+        rules = (set([rule1, rule2]))
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        self.assertEqual(abap.generate_arguments(a), {frozenset(), frozenset({b})})
+
+    def test_generate_multiple_arguments2(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        assumptions = set([b])
+
+        rule1 = Rule(set([b]), a)
+        rule2 = Rule(set(), a)
+        rules = (set([rule1, rule2]))
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        self.assertEqual(abap.generate_arguments(a), {frozenset(), frozenset({b})})
+
+    def test_generate_multiple_arguments3(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        c = Predicate("c")
+        d = Predicate("d")
+        assumptions = set([b, d])
+
+        rule1 = Rule(set([b, c]), a)
+        rule2 = Rule(set(), c)
+        rule3 = Rule(set([d]), c)
+        rules = (set([rule1, rule2, rule3]))
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        self.assertEqual(abap.generate_arguments(a), {frozenset({b}), frozenset({b, d})})
+
+    def test_cycle_generate_argument(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        assumptions = set([b])
+
+        rule1 = Rule(set([a]), a)
+        rule2 = Rule(set([b]), a)
+        rules = (set([rule1, rule2]))
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+
+        self.assertEqual(abap.generate_arguments(a), {frozenset({b})})
 
 
 
