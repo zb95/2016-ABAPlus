@@ -7,11 +7,56 @@ NO_RELATION = 3
 CANNOT_BE_DERIVED = -1
 
 class ABA_Plus:
-    #TODO: preference transitivity
     def __init__(self, assumptions=set(), preferences=set(), rules=set()):
         self.assumptions = assumptions
         self.preferences = preferences
         self.rules = rules
+
+        self.calc_transitive_closure()
+
+    # returns Flase if error with preferences, e.g. a < a, True otherwise
+    def calc_transitive_closure(self):
+        assump_list = list(self.assumptions)
+        m = len(assump_list)
+        relation_matrix = np.full((m, m), NO_RELATION)
+        np.fill_diagonal(relation_matrix, LESS_EQUAL)
+        for pref in self.preferences:
+            idx1 = assump_list.index(pref.assump1)
+            idx2 = assump_list.index(pref.assump2)
+            relation_matrix[idx1][idx2] = pref.relation
+
+        closed_matrix = self._transitive_closure(relation_matrix)
+
+        for i in range(0, m):
+            for j in range(0, m):
+                relation = closed_matrix[i][j]
+                if i == j and relation == LESS_THAN:
+                    return False
+                if i != j and relation != NO_RELATION:
+                    assump1 = assump_list[i]
+                    assump2 = assump_list[j]
+                    self.preferences.add(Preference(assump1, assump2, relation))
+
+        return True
+
+
+
+
+    # in relation_matrix, use 1 for < and 2 for <=
+    def _transitive_closure(self, relation_matrix):
+        n = len(relation_matrix)
+        d = np.copy(relation_matrix)
+
+        for k in range(0, n):
+            for i in range(0, n):
+                for j in range(0, n):
+                    alt_rel = NO_RELATION
+                    if not (d[i][k] == NO_RELATION or d[k][j] == NO_RELATION):
+                        alt_rel = min(d[i][k], d[k][j])
+
+                    d[i][j] = min(d[i][j], alt_rel)
+
+        return d
 
     def __str__(self):
         return str(self.__dict__)
@@ -192,24 +237,15 @@ class Preference:
         self.assump2 = assump2
         self.relation = relation
 
+    def __eq__(self, other):
+        return self.assump1 == other.assump1 and \
+               self.assump2 == other.assump2 and \
+               self.relation == other.relation
+
     def __str__(self):
         return str(self.__dict__)
 
     def __hash__(self):
         return (self.assump1, self.assump2, self.relation).__hash__()
 
-# in relation_matrix, use 1 for < and 2 for <=
-def transitive_closure(relation_matrix):
-    n = len(relation_matrix)
-    d = np.copy(relation_matrix)
 
-    for k in range(0, n):
-        for i in range(0, n):
-            for j in range(0, n):
-                alt_rel = NO_RELATION
-                if not (d[i][k] == NO_RELATION or d[k][j] == NO_RELATION):
-                    alt_rel = min(d[i][k], d[k][j])
-
-                d[i][j] = min(d[i][j], alt_rel)
-
-    return d

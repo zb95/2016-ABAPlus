@@ -3,6 +3,19 @@ from aba_plus import *
 
 class TestABAPlus(unittest.TestCase):
 
+    def test_simple_transitive_closure(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        c = Predicate("c")
+        assumptions = set([a, b, c])
+
+        pref1 = Preference(a, b, LESS_THAN)
+        pref2 = Preference(b, c, LESS_THAN)
+        preferences = set([pref1, pref2])
+
+        abap = ABA_Plus(assumptions=assumptions, rules=set(), preferences=preferences)
+        self.assertEqual(abap.preferences, {pref1, pref2, Preference(a, c, LESS_THAN)})
+
     def test_simple_deduction_exists(self):
         a = Predicate("a")
         b = Predicate("b")
@@ -488,8 +501,6 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(abap.generate_arguments(a), set())
 
 
-
-    '''
     def test_complex_generate_arguments1(self):
         alpha = Predicate("alpha")
         beta = Predicate("beta")
@@ -526,7 +537,6 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(abap.generate_arguments(delta), {frozenset({delta})})
         self.assertEqual(abap.generate_arguments(d), {frozenset({alpha, beta, gamma})})
 
-    '''
 
     def test_complex_generate_arguments2(self):
         alpha = Predicate("alpha")
