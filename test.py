@@ -614,4 +614,76 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(abap.generate_arguments(a), {frozenset()})
         self.assertEqual(abap.generate_arguments(b), {frozenset({beta})})
 
+    def test_simple_generate_arguments_and_attacks1(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        c = Predicate("c")
+        assumptions = {a,b,c}
+
+        rule = Rule({a,c}, b.contrary())
+        rules = {rule}
+
+        pref1 = Preference(a, b, LESS_THAN)
+        pref2 = Preference(c, b, LESS_THAN)
+        preferences = {pref1, pref2}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
+
+        res = abap.generate_arguments_and_attacks({a.contrary(), b.contrary(), c.contrary()})
+        deductions = res[0]
+        attacks = res[1]
+
+        self.assertEqual(deductions[a], {Deduction({a}, {a})})
+        self.assertEqual(deductions[b], {Deduction({b}, {b})})
+        self.assertEqual(deductions[c], {Deduction({c}, {c})})
+        self.assertEqual(deductions[b.contrary()], {Deduction({a,c}, {b.contrary()})})
+        self.assertEqual(len(deductions), 4)
+
+        self.assertEqual(attacks, {Attack(Deduction({b}, {b}), Deduction({a,c}, {b.contrary()}), REVERSE_ATK)})
+
+    def test_simple_generate_arguments_and_attacks2(self):
+        a = Predicate("a")
+        b = Predicate("b")
+        c = Predicate("c")
+        assumptions = {a, b, c}
+
+        rule1 = Rule({a, c}, b.contrary())
+        rule2 = Rule({b, c}, a.contrary())
+        rule3 = Rule({a, b}, c.contrary())
+        rules = {rule1, rule2, rule3}
+
+        pref1 = Preference(a, b, LESS_THAN)
+        pref2 = Preference(c, b, LESS_THAN)
+        preferences = {pref1, pref2}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
+
+        res = abap.generate_arguments_and_attacks({a.contrary(), b.contrary(), c.contrary()})
+        deductions = res[0]
+        attacks = res[1]
+
+        ded_a = Deduction({a}, {a})
+        ded_b = Deduction({b}, {b})
+        ded_c = Deduction({c}, {c})
+        ded_contr_a = Deduction({b, c}, {a.contrary()})
+        ded_contr_b = Deduction({a, c}, {b.contrary()})
+        ded_contr_c = Deduction({a, b}, {c.contrary()})
+
+        self.assertEqual(deductions[a], {ded_a})
+        self.assertEqual(deductions[b], {ded_b})
+        self.assertEqual(deductions[c], {ded_c})
+        self.assertEqual(deductions[a.contrary()], {ded_contr_a})
+        self.assertEqual(deductions[b.contrary()], {ded_contr_b})
+        self.assertEqual(deductions[c.contrary()], {ded_contr_c})
+        self.assertEqual(len(deductions), 6)
+
+        self.assertEqual(attacks, {Attack(ded_b, ded_contr_b, REVERSE_ATK),
+                                   Attack(ded_contr_a, ded_a, NORMAL_ATK),
+                                   Attack(ded_contr_c, ded_c, NORMAL_ATK),
+                                   Attack(ded_contr_a, ded_contr_b, NORMAL_ATK),
+                                   Attack(ded_contr_a, ded_contr_b, NORMAL_ATK),
+                                   Attack(ded_contr_a, ded_contr_b, REVERSE_ATK),
+                                   Attack(ded_contr_c, ded_contr_a, NORMAL_ATK),
+                                   Attack(ded_contr_c, ded_contr_b, REVERSE_ATK),
+                                   Attack(ded_contr_c, ded_contr_b, NORMAL_ATK)})
 

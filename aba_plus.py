@@ -6,6 +6,9 @@ NO_RELATION = 3
 
 CANNOT_BE_DERIVED = -1
 
+NORMAL_ATK = 1
+REVERSE_ATK = 2
+
 class ABA_Plus:
     def __init__(self, assumptions=set(), preferences=set(), rules=set()):
         self.assumptions = assumptions
@@ -38,9 +41,6 @@ class ABA_Plus:
                     self.preferences.add(Preference(assump1, assump2, relation))
 
         return True
-
-
-
 
     # in relation_matrix, use 1 for < and 2 for <=
     def _transitive_closure(self, relation_matrix):
@@ -166,6 +166,7 @@ class ABA_Plus:
                     return False
         return True
 
+    #TODO: rename to avoid confusion between supporting sets and 'arguments' in abstract argumentation
     def generate_arguments(self, generate_for):
         return self._generate_arguments(generate_for, set())
 
@@ -195,7 +196,58 @@ class ABA_Plus:
                 results = results.union(self.set_combinations(supporting_assumptions))
         return results
 
+    def generate_arguments_and_attacks(self, generate_for):
+        deductions = {}
+        attacks = set()
 
+        # generate trivial deductions for all assumptions:
+        for assumption in self.assumptions:
+            deductions[assumption] = set()
+            deductions[assumption].add(Deduction({assumption}, {assumption}))
+            #print(next(iter(deductions[assumption])))
+
+        # generate supporting assumptions
+        for sentence in generate_for:
+            args = self.generate_arguments(sentence)
+            if args:
+                deductions[sentence] = set()
+
+                for arg in args:
+                    arg_deduction = Deduction(arg, {sentence})
+                    deductions[sentence].add(arg_deduction)
+
+                    if sentence.is_contrary and sentence.contrary() in self.assumptions:
+                        trivial_arg = Deduction({sentence.contrary()}, {sentence.contrary()})
+                        if self.attack_successful(arg, sentence.contrary()):
+                            attacks.add(Attack(arg_deduction, trivial_arg, NORMAL_ATK))
+                        else:
+                            attacks.add(Attack(trivial_arg, arg_deduction, REVERSE_ATK))
+
+        # generate attacks between supporting sets
+        for _, deduction_set in deductions.items():
+            for deduction in deduction_set:
+                for sentence in deduction.premise:
+                    if sentence.contrary() in deductions:
+                        attacking_args = deductions[sentence.contrary()]
+                        for attacking_arg in attacking_args:
+                            if self.attack_successful(attacking_arg.premise, sentence):
+                                attacks.add(Attack(attacking_arg, deduction, NORMAL_ATK))
+                            else:
+                                attacks.add(Attack(deduction, attacking_arg, REVERSE_ATK))
+
+        return (deductions, attacks)
+
+
+
+    def attack_successful(self, attacker, attackee):
+        for atk in attacker:
+            if self.get_relation(atk, attackee) == LESS_THAN:
+                return False
+        return True
+
+    def generate_attack(self, deduction):
+        for p in deduction.premise:
+            pass
 
 
 class Rule:
@@ -214,22 +266,22 @@ class Rule:
         return (tuple(self.antecedent), self.consequent).__hash__()
 
 class Predicate:
-    def __init__(self, symbol=None, is_negated=False):
+    def __init__(self, symbol=None, is_contrary=False):
         self.symbol = symbol
-        self.is_negated = is_negated
+        self.is_contrary = is_contrary
 
     def __eq__(self, other):
-        return self.is_negated == other.is_negated and \
+        return self.is_contrary == other.is_contrary and \
                self.symbol == other.symbol
 
     def __str__(self):
         return str(self.__dict__)
 
     def __hash__(self):
-        return (self.symbol, self.is_negated).__hash__()
+        return (self.symbol, self.is_contrary).__hash__()
 
     def contrary(self):
-        return Predicate(self.symbol, not self.is_negated)
+        return Predicate(self.symbol, not self.is_contrary)
 
 class Preference:
     def __init__(self, assump1=None, assump2=None, relation=NO_RELATION):
@@ -247,5 +299,37 @@ class Preference:
 
     def __hash__(self):
         return (self.assump1, self.assump2, self.relation).__hash__()
+
+class Attack:
+    def __init__(self, attacker, attackee, type):
+        self.attacker = attacker
+        self.attackee = attackee
+        self.type = type
+
+    def __eq__(self, other):
+        return self.attacker == other.attacker and \
+               self.attackee == other.attackee and \
+               self.type == other.type
+
+    def __hash__(self):
+        return (self.attacker, self.attackee, type).__hash__()
+
+class Deduction:
+    def __init__(self, premise, conclusion):
+        self.premise = premise
+        self.conclusion = conclusion
+
+    def __eq__(self, other):
+        return self.premise == other.premise and \
+               self.conclusion == other.conclusion
+
+    def __str__(self):
+        return str(self.__dict__)
+
+    def __hash__(self):
+        return (tuple(self.premise), tuple(self.conclusion)).__hash__()
+
+
+
 
 
