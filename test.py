@@ -680,7 +680,7 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(attacks, {Attack(ded_b, ded_contr_b, REVERSE_ATK),
                                    Attack(ded_contr_a, ded_a, NORMAL_ATK),
                                    Attack(ded_contr_c, ded_c, NORMAL_ATK),
-                                   Attack(ded_contr_a, ded_contr_b, NORMAL_ATK),
+                                   Attack(ded_contr_a, ded_contr_c, NORMAL_ATK),
                                    Attack(ded_contr_a, ded_contr_b, NORMAL_ATK),
                                    Attack(ded_contr_a, ded_contr_b, REVERSE_ATK),
                                    Attack(ded_contr_c, ded_contr_a, NORMAL_ATK),

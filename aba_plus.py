@@ -311,6 +311,9 @@ class Attack:
                self.attackee == other.attackee and \
                self.type == other.type
 
+    def __str__(self):
+        return str(self.__dict__)
+
     def __hash__(self):
         return (self.attacker, self.attackee, type).__hash__()
 
