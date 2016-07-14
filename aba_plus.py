@@ -265,7 +265,7 @@ class Rule:
     def __hash__(self):
         return (tuple(self.antecedent), self.consequent).__hash__()
 
-class Predicate:
+class Sentence:
     def __init__(self, symbol=None, is_contrary=False):
         self.symbol = symbol
         self.is_contrary = is_contrary
@@ -281,7 +281,7 @@ class Predicate:
         return (self.symbol, self.is_contrary).__hash__()
 
     def contrary(self):
-        return Predicate(self.symbol, not self.is_contrary)
+        return Sentence(self.symbol, not self.is_contrary)
 
 class Preference:
     def __init__(self, assump1=None, assump2=None, relation=NO_RELATION):

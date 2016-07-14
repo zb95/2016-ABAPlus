@@ -4,9 +4,9 @@ from aba_plus import *
 class TestABAPlus(unittest.TestCase):
 
     def test_simple_transitive_closure(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = set([a, b, c])
 
         pref1 = Preference(a, b, LESS_THAN)
@@ -17,8 +17,8 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(abap.preferences, {pref1, pref2, Preference(a, c, LESS_THAN)})
 
     def test_simple_deduction_exists(self):
-        a = Predicate("a")
-        b = Predicate("b")
+        a = Sentence("a")
+        b = Sentence("b")
         assumptions = set([b])
 
         rule = Rule(set([b]),a)
@@ -29,8 +29,8 @@ class TestABAPlus(unittest.TestCase):
         self.assertTrue(abap.deduction_exists(to_deduce=a, deduce_from=set([b])))
 
     def test_deduction_from_empty_set_exists(self):
-        a = Predicate("a")
-        b = Predicate("b")
+        a = Sentence("a")
+        b = Sentence("b")
         assumptions = set([b])
 
         rule = Rule(set(), a)
@@ -41,9 +41,9 @@ class TestABAPlus(unittest.TestCase):
         self.assertTrue(abap.deduction_exists(to_deduce=a, deduce_from=set()))
 
     def test_simple_deduction_does_not_exist(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = set([a, b])
 
         rule = Rule(set([b]), c)
@@ -54,9 +54,9 @@ class TestABAPlus(unittest.TestCase):
         self.assertFalse(abap.deduction_exists(to_deduce=a, deduce_from=set([b])))
 
     def test_transitive_deduction_exists(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = set([b])
 
         rule1 = Rule(set([b]), c)
@@ -68,8 +68,8 @@ class TestABAPlus(unittest.TestCase):
         self.assertTrue(abap.deduction_exists(to_deduce=a, deduce_from=set([b])))
 
     def test_transitive_deduction_from_empty_set_exists(self):
-        a = Predicate("a")
-        b = Predicate("b")
+        a = Sentence("a")
+        b = Sentence("b")
         assumptions = set()
 
         rule1 = Rule(set([b]), a)
@@ -81,13 +81,13 @@ class TestABAPlus(unittest.TestCase):
         self.assertTrue(abap.deduction_exists(to_deduce=a, deduce_from=set()))
 
     def test_complex_deduction_exists(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
-        d = Predicate("d")
-        e = Predicate("e")
-        f = Predicate("f")
-        g = Predicate("g")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        d = Sentence("d")
+        e = Sentence("e")
+        f = Sentence("f")
+        g = Sentence("g")
         assumptions = set([a, b, e])
 
         rule1 = Rule(set([a, b]), c)
@@ -100,13 +100,13 @@ class TestABAPlus(unittest.TestCase):
         self.assertTrue(abap.deduction_exists(to_deduce=g, deduce_from=set([a, b, e])))
 
     def test_complex_deduction_does_not_exist(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
-        d = Predicate("d")
-        e = Predicate("e")
-        f = Predicate("f")
-        g = Predicate("g")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        d = Sentence("d")
+        e = Sentence("e")
+        f = Sentence("f")
+        g = Sentence("g")
         assumptions = set([a, b, e])
 
         rule1 = Rule(set([a, b]), c)
@@ -119,9 +119,9 @@ class TestABAPlus(unittest.TestCase):
         self.assertFalse(abap.deduction_exists(to_deduce=g, deduce_from=set([a, e])))
 
     def test_simple_WCP_no_violation_check1(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = set([a, b])
 
         rule = Rule(set([b]), c)
@@ -132,8 +132,8 @@ class TestABAPlus(unittest.TestCase):
         self.assertTrue(abap.check_WCP())
 
     def test_simple_WCP_no_violation_check2(self):
-        a = Predicate("a")
-        b = Predicate("b")
+        a = Sentence("a")
+        b = Sentence("b")
         assumptions = set([a, b])
 
         rule1 = Rule(set([b]), a.contrary())
@@ -145,9 +145,9 @@ class TestABAPlus(unittest.TestCase):
         self.assertTrue(abap.check_WCP())
 
     def test_simple_WCP_no_violation_check3(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = set([a, b, c])
 
         rule1 = Rule(set([b]), a.contrary())
@@ -159,8 +159,8 @@ class TestABAPlus(unittest.TestCase):
         self.assertTrue(abap.check_WCP())
 
     def test_simple_WCP_violation_check(self):
-        a = Predicate("a")
-        b = Predicate("b")
+        a = Sentence("a")
+        b = Sentence("b")
         assumptions = set([a, b])
 
         pref = Preference(b, a, LESS_THAN)
@@ -174,9 +174,9 @@ class TestABAPlus(unittest.TestCase):
         self.assertFalse(abap.check_WCP())
 
     def test_transitive_WCP_violation_check(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = set([a, b])
 
         pref = Preference(b, a, LESS_THAN)
@@ -191,9 +191,9 @@ class TestABAPlus(unittest.TestCase):
         self.assertFalse(abap.check_WCP())
 
     def test_transitive_WCP_violation_check(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = set([a, b])
 
         pref = Preference(b, a, LESS_THAN)
@@ -208,9 +208,9 @@ class TestABAPlus(unittest.TestCase):
         self.assertFalse(abap.check_WCP())
 
     def test_cycle_WCP_violation_check(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = set([a, b])
 
         pref = Preference(b, a, LESS_THAN)
@@ -226,10 +226,10 @@ class TestABAPlus(unittest.TestCase):
         self.assertFalse(abap.check_WCP())
 
     def test_cycle_WCP_no_violation_check(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
-        d = Predicate("d")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        d = Sentence("d")
         assumptions = set([a])
 
         rule1 = Rule(set([b]), a.contrary())
@@ -243,20 +243,20 @@ class TestABAPlus(unittest.TestCase):
         self.assertTrue(abap.check_WCP())
 
     def test_complex_WCP_no_violation_check1(self):
-        alpha = Predicate("alpha")
-        beta = Predicate("beta")
-        gamma = Predicate("gamma")
-        delta = Predicate("delta")
-        d = Predicate("d")
-        k = Predicate("k")
-        m = Predicate("m")
-        p = Predicate("p")
-        q = Predicate("q")
-        r = Predicate("r")
-        s = Predicate("s")
-        t = Predicate("t")
-        u = Predicate("u")
-        v = Predicate("v")
+        alpha = Sentence("alpha")
+        beta = Sentence("beta")
+        gamma = Sentence("gamma")
+        delta = Sentence("delta")
+        d = Sentence("d")
+        k = Sentence("k")
+        m = Sentence("m")
+        p = Sentence("p")
+        q = Sentence("q")
+        r = Sentence("r")
+        s = Sentence("s")
+        t = Sentence("t")
+        u = Sentence("u")
+        v = Sentence("v")
         assumptions = set([alpha, beta, gamma, delta])
 
         rule1 = Rule(set([p, q]), alpha.contrary())
@@ -284,24 +284,24 @@ class TestABAPlus(unittest.TestCase):
         self.assertTrue(abap.check_WCP())
 
     def test_complex_WCP_no_violation_check2(self):
-        alpha = Predicate("alpha")
-        beta = Predicate("beta")
-        gamma = Predicate("gamma")
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
-        k = Predicate("k")
-        l = Predicate("l")
-        m = Predicate("m")
-        n = Predicate("n")
-        p = Predicate("p")
-        q = Predicate("q")
-        s = Predicate("s")
-        t = Predicate("t")
-        u = Predicate("u")
-        v = Predicate("v")
-        x = Predicate("x")
-        z = Predicate("z")
+        alpha = Sentence("alpha")
+        beta = Sentence("beta")
+        gamma = Sentence("gamma")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        k = Sentence("k")
+        l = Sentence("l")
+        m = Sentence("m")
+        n = Sentence("n")
+        p = Sentence("p")
+        q = Sentence("q")
+        s = Sentence("s")
+        t = Sentence("t")
+        u = Sentence("u")
+        v = Sentence("v")
+        x = Sentence("x")
+        z = Sentence("z")
         assumptions = set([alpha, beta, gamma])
 
         rule1 = Rule(set([a, b, c]), x)
@@ -351,7 +351,7 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(combs, correct_combs)
 
     def test_simple_generate_argument1(self):
-        a = Predicate("a")
+        a = Sentence("a")
         assumptions = set([a])
 
 
@@ -362,9 +362,9 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(abap.generate_arguments(a), {frozenset({a})})
 
     def test_simple_generate_argument2(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = set([b,c])
 
         rule = Rule(set([b, c]), a)
@@ -377,7 +377,7 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(abap.generate_arguments(a), {frozenset({b,c})})
 
     def test_generate_empty_argument(self):
-        a = Predicate("a")
+        a = Sentence("a")
 
         rule = Rule(set(), a)
         rules = (set([rule]))
@@ -389,11 +389,11 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(abap.generate_arguments(a), {frozenset()})
 
     def test_transitive_generate_argument(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
-        d = Predicate("d")
-        e = Predicate("e")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        d = Sentence("d")
+        e = Sentence("e")
         assumptions = set([b, c, d])
 
         rule1 = Rule(set([b, e]), a)
@@ -406,11 +406,11 @@ class TestABAPlus(unittest.TestCase):
 
 
     def test_generate_multiple_arguments1(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
-        d = Predicate("d")
-        e = Predicate("e")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        d = Sentence("d")
+        e = Sentence("e")
         assumptions = set([b, d, e])
 
         rule1 = Rule(set([b, c]), a)
@@ -424,8 +424,8 @@ class TestABAPlus(unittest.TestCase):
 
 
     def test_generate_multiple_arguments2(self):
-        a = Predicate("a")
-        b = Predicate("b")
+        a = Sentence("a")
+        b = Sentence("b")
         assumptions = set([b])
 
         rule1 = Rule(set([b]), a)
@@ -438,10 +438,10 @@ class TestABAPlus(unittest.TestCase):
 
 
     def test_generate_multiple_arguments3(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
-        d = Predicate("d")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        d = Sentence("d")
         assumptions = set([b, d])
 
         rule1 = Rule(set([b, c]), a)
@@ -455,8 +455,8 @@ class TestABAPlus(unittest.TestCase):
 
 
     def test_cycle_generate_argument1(self):
-        a = Predicate("a")
-        b = Predicate("b")
+        a = Sentence("a")
+        b = Sentence("b")
         assumptions = set([b])
 
         rule1 = Rule(set([a]), a)
@@ -469,11 +469,11 @@ class TestABAPlus(unittest.TestCase):
 
 
     def test_cycle_generate_argument2(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
-        d = Predicate("d")
-        e = Predicate("e")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        d = Sentence("d")
+        e = Sentence("e")
         assumptions = set([e])
 
         rule1 = Rule(set([b]), a)
@@ -489,8 +489,8 @@ class TestABAPlus(unittest.TestCase):
 
 
     def test_generate_no_arguments(self):
-        a = Predicate("a")
-        b = Predicate("b")
+        a = Sentence("a")
+        b = Sentence("b")
         assumptions = set()
 
         rule = Rule(set([b]), a)
@@ -502,18 +502,18 @@ class TestABAPlus(unittest.TestCase):
 
 
     def test_complex_generate_arguments1(self):
-        alpha = Predicate("alpha")
-        beta = Predicate("beta")
-        gamma = Predicate("gamma")
-        delta = Predicate("delta")
-        d = Predicate("d")
-        s1 = Predicate("s1")
-        s2 = Predicate("s2")
-        s3 = Predicate("s3")
-        s4 = Predicate("s4")
-        s5 = Predicate("s5")
-        s6 = Predicate("s6")
-        s7 = Predicate("s7")
+        alpha = Sentence("alpha")
+        beta = Sentence("beta")
+        gamma = Sentence("gamma")
+        delta = Sentence("delta")
+        d = Sentence("d")
+        s1 = Sentence("s1")
+        s2 = Sentence("s2")
+        s3 = Sentence("s3")
+        s4 = Sentence("s4")
+        s5 = Sentence("s5")
+        s6 = Sentence("s6")
+        s7 = Sentence("s7")
         assumptions = set([alpha, beta, gamma, delta])
 
         rule1 = Rule(set([s3, s4]), d)
@@ -539,22 +539,22 @@ class TestABAPlus(unittest.TestCase):
 
 
     def test_complex_generate_arguments2(self):
-        alpha = Predicate("alpha")
-        beta = Predicate("beta")
-        gamma = Predicate("gamma")
-        delta = Predicate("delta")
-        epsilon = Predicate("epsilon")
-        d = Predicate("d")
-        s1 = Predicate("s1")
-        s2 = Predicate("s2")
-        s3 = Predicate("s3")
-        s4 = Predicate("s4")
-        s5 = Predicate("s5")
-        s6 = Predicate("s6")
-        s7 = Predicate("s7")
-        s8 = Predicate("s8")
-        s9 = Predicate("s9")
-        s10 = Predicate("s10")
+        alpha = Sentence("alpha")
+        beta = Sentence("beta")
+        gamma = Sentence("gamma")
+        delta = Sentence("delta")
+        epsilon = Sentence("epsilon")
+        d = Sentence("d")
+        s1 = Sentence("s1")
+        s2 = Sentence("s2")
+        s3 = Sentence("s3")
+        s4 = Sentence("s4")
+        s5 = Sentence("s5")
+        s6 = Sentence("s6")
+        s7 = Sentence("s7")
+        s8 = Sentence("s8")
+        s9 = Sentence("s9")
+        s10 = Sentence("s10")
         assumptions = set([alpha, beta, gamma, delta, epsilon])
 
         rule1 = Rule(set([alpha, beta]), s1)
@@ -582,17 +582,17 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(abap.generate_arguments(d), {frozenset({gamma})})
 
     def test_complex_generate_arguments3(self):
-        alpha = Predicate("alpha")
-        beta = Predicate("beta")
-        a = Predicate("a")
-        b = Predicate("b")
-        s1 = Predicate("s1")
-        s2 = Predicate("s2")
-        s3 = Predicate("s3")
-        s4 = Predicate("s4")
-        s5 = Predicate("s5")
-        s6 = Predicate("s6")
-        s7 = Predicate("s7")
+        alpha = Sentence("alpha")
+        beta = Sentence("beta")
+        a = Sentence("a")
+        b = Sentence("b")
+        s1 = Sentence("s1")
+        s2 = Sentence("s2")
+        s3 = Sentence("s3")
+        s4 = Sentence("s4")
+        s5 = Sentence("s5")
+        s6 = Sentence("s6")
+        s7 = Sentence("s7")
         assumptions = set([alpha, beta])
 
         rule1 = Rule(set([s1]), a)
@@ -615,9 +615,9 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(abap.generate_arguments(b), {frozenset({beta})})
 
     def test_simple_generate_arguments_and_attacks1(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = {a,b,c}
 
         rule = Rule({a,c}, b.contrary())
@@ -642,9 +642,9 @@ class TestABAPlus(unittest.TestCase):
         self.assertEqual(attacks, {Attack(Deduction({b}, {b}), Deduction({a,c}, {b.contrary()}), REVERSE_ATK)})
 
     def test_simple_generate_arguments_and_attacks2(self):
-        a = Predicate("a")
-        b = Predicate("b")
-        c = Predicate("c")
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
         assumptions = {a, b, c}
 
         rule1 = Rule({a, c}, b.contrary())
