@@ -17,7 +17,7 @@ class ABA_Plus:
 
         self.calc_transitive_closure()
 
-    # returns Flase if error with preferences, e.g. a < a, True otherwise
+    # returns False if error with preferences, e.g. a < a, True otherwise
     def calc_transitive_closure(self):
         assump_list = list(self.assumptions)
         m = len(assump_list)
@@ -237,6 +237,9 @@ class ABA_Plus:
                                 attacks.add(Attack(deduction, attacking_arg, REVERSE_ATK))
 
         return (deductions, attacks)
+
+    def generate_arguments_and_attacks_for_contraries(self):
+        return self.generate_arguments_and_attacks([asm.contrary() for asm in self.assumptions])
 
 
 
