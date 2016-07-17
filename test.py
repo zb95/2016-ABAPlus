@@ -1,5 +1,6 @@
 import unittest
 from aba_plus import *
+from aspartix_interface import *
 
 class TestABAPlus(unittest.TestCase):
 
@@ -645,7 +646,8 @@ class TestABAPlus(unittest.TestCase):
 
         abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
 
-        res = abap.generate_arguments_and_attacks({a.contrary(), b.contrary(), c.contrary()})
+        #res = abap.generate_arguments_and_attacks({a.contrary(), b.contrary(), c.contrary()})
+        res = abap.generate_arguments_and_attacks_for_contraries()
         deductions = res[0]
         attacks = res[1]
 
@@ -703,3 +705,19 @@ class TestABAPlus(unittest.TestCase):
                                    Attack(ded_contr_c, ded_contr_b, REVERSE_ATK),
                                    Attack(ded_contr_c, ded_contr_b, NORMAL_ATK)})
 
+    def test_simple_calculate_admissible_extensions(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        assumptions = {a, b}
+
+        rule = Rule({a}, b.contrary())
+        rules = {rule}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences = {})
+
+        asp = ASPARTIX_Interface(abap)
+
+        asp.generate_input_file_for_clingo("test.lp")
+        adm_ext =  asp.calculate_admissible_extensions("test.lp")
+
+        self.assertEqual(adm_ext, {frozenset({a})})

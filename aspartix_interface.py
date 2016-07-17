@@ -1,4 +1,6 @@
 from aba_plus import *
+import subprocess
+import re
 
 class ASPARTIX_Interface:
     def __init__(self, aba_plus):
@@ -26,4 +28,15 @@ class ASPARTIX_Interface:
             f.write("att({}, {}).\n".format(idx_attacker, idx_attackee))
 
         f.close()
+
+    def calculate_admissible_extensions(self, filename):
+        res = subprocess.run("clingo {} adm.dl 0".format(filename), stdout=subprocess.PIPE, universal_newlines=True)
+
+        matches = re.findall(r"in\((\d+)\)", res.stdout)
+        extensions = set()
+        for m in matches:
+            s = self.arguments[int(m)].premise
+            extensions.add(frozenset(s))
+
+        return extensions
 
