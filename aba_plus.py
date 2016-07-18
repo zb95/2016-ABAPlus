@@ -10,7 +10,7 @@ NORMAL_ATK = 1
 REVERSE_ATK = 2
 
 class ABA_Plus:
-    def __init__(self, assumptions=set(), preferences=set(), rules=set()):
+    def __init__(self, assumptions, preferences, rules):
         self.assumptions = assumptions
         self.preferences = preferences
         self.rules = rules
@@ -335,6 +335,15 @@ class Deduction:
 
     def __hash__(self):
         return (tuple(self.premise), tuple(self.conclusion)).__hash__()
+
+### FOR DEBUGGING ###
+def print_deduction(deduction):
+    print("premise:")
+    for p in deduction.premise:
+        print(p)
+    print("conclusion:")
+    for c in deduction.conclusion:
+        print(c)
 
 
 

@@ -25,7 +25,7 @@ class TestABAPlus(unittest.TestCase):
         rule = Rule(set([b]),a)
         rules = (set([rule]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertTrue(abap.deduction_exists(to_deduce=a, deduce_from=set([b])))
 
@@ -37,7 +37,7 @@ class TestABAPlus(unittest.TestCase):
         rule = Rule(set(), a)
         rules = (set([rule]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertTrue(abap.deduction_exists(to_deduce=a, deduce_from=set()))
 
@@ -50,7 +50,7 @@ class TestABAPlus(unittest.TestCase):
         rule = Rule(set([b]), c)
         rules = (set([rule]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertFalse(abap.deduction_exists(to_deduce=a, deduce_from=set([b])))
 
@@ -64,7 +64,7 @@ class TestABAPlus(unittest.TestCase):
         rule2 = Rule(set([c]), a)
         rules = (set([rule1, rule2]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertTrue(abap.deduction_exists(to_deduce=a, deduce_from=set([b])))
 
@@ -77,7 +77,7 @@ class TestABAPlus(unittest.TestCase):
         rule2 = Rule(set(), b)
         rules = (set([rule1, rule2]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertTrue(abap.deduction_exists(to_deduce=a, deduce_from=set()))
 
@@ -96,7 +96,7 @@ class TestABAPlus(unittest.TestCase):
         rule3 = Rule(set([c, f]), g)
         rules = (set([rule1, rule2, rule3]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertTrue(abap.deduction_exists(to_deduce=g, deduce_from=set([a, b, e])))
 
@@ -115,7 +115,7 @@ class TestABAPlus(unittest.TestCase):
         rule3 = Rule(set([c, f]), g)
         rules = (set([rule1, rule2, rule3]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertFalse(abap.deduction_exists(to_deduce=g, deduce_from=set([a, e])))
 
@@ -128,7 +128,7 @@ class TestABAPlus(unittest.TestCase):
         rule = Rule(set([b]), c)
         rules = (set([rule]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertTrue(abap.check_WCP())
 
@@ -141,7 +141,7 @@ class TestABAPlus(unittest.TestCase):
         rule2 = Rule(set([a]), b.contrary())
         rules = (set([rule1, rule2]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertTrue(abap.check_WCP())
 
@@ -155,7 +155,7 @@ class TestABAPlus(unittest.TestCase):
         rule2 = Rule(set([c]), b.contrary())
         rules = (set([rule1, rule2]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertTrue(abap.check_WCP())
 
@@ -239,7 +239,7 @@ class TestABAPlus(unittest.TestCase):
         rule4 = Rule(set([b]), d)
         rules = (set([rule1, rule2, rule3, rule4]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertTrue(abap.check_WCP())
 
@@ -325,12 +325,12 @@ class TestABAPlus(unittest.TestCase):
                  rule7, rule8, rule9, rule10, rule11, rule12, rule13,
                  rule14, rule15, rule16}
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertTrue(abap.check_WCP())
 
     def test_set_combinations(self):
-        abap = ABA_Plus()
+        abap = ABA_Plus(set(), set(), set())
 
         set1 = set()
         set1.add(frozenset({"b"}))
@@ -356,7 +356,7 @@ class TestABAPlus(unittest.TestCase):
         assumptions = set([a])
 
 
-        abap = ABA_Plus(assumptions=assumptions)
+        abap = ABA_Plus(assumptions=assumptions, rules=set(), preferences=set())
 
         res = abap.generate_arguments(a)
 
@@ -371,7 +371,7 @@ class TestABAPlus(unittest.TestCase):
         rule = Rule(set([b, c]), a)
         rules = (set([rule]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         res = abap.generate_arguments(a)
 
@@ -383,7 +383,7 @@ class TestABAPlus(unittest.TestCase):
         rule = Rule(set(), a)
         rules = (set([rule]))
 
-        abap = ABA_Plus(rules=rules)
+        abap = ABA_Plus(assumptions=set(), rules=rules, preferences=set())
 
         res = abap.generate_arguments(a)
 
@@ -401,7 +401,7 @@ class TestABAPlus(unittest.TestCase):
         rule2 = Rule(set([c, d]), e)
         rules = (set([rule1, rule2]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b, c, d})})
 
@@ -419,7 +419,7 @@ class TestABAPlus(unittest.TestCase):
         rule3 = Rule(set([e]), c)
         rules = (set([rule1, rule2, rule3]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b, d}), frozenset({b, e})})
 
@@ -433,7 +433,7 @@ class TestABAPlus(unittest.TestCase):
         rule2 = Rule(set(), a)
         rules = (set([rule1, rule2]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertEqual(abap.generate_arguments(a), {frozenset(), frozenset({b})})
 
@@ -450,7 +450,7 @@ class TestABAPlus(unittest.TestCase):
         rule3 = Rule(set([d]), c)
         rules = (set([rule1, rule2, rule3]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b}), frozenset({b, d})})
 
@@ -464,7 +464,7 @@ class TestABAPlus(unittest.TestCase):
         rule2 = Rule(set([b]), a)
         rules = (set([rule1, rule2]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({b})})
 
@@ -484,7 +484,7 @@ class TestABAPlus(unittest.TestCase):
         rule5 = Rule(set([e]), a)
         rules = (set([rule1, rule2, rule3, rule4, rule5]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertEqual(abap.generate_arguments(a), {frozenset({e})})
 
@@ -513,7 +513,7 @@ class TestABAPlus(unittest.TestCase):
         rule = Rule(set([b]), a)
         rules = (set([rule]))
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertEqual(abap.generate_arguments(a), set())
 
@@ -546,7 +546,7 @@ class TestABAPlus(unittest.TestCase):
         rules = {rule1, rule2, rule3, rule4, rule5,
                  rule6, rule7, rule8, rule9, rule10, }
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertEqual(abap.generate_arguments(alpha), {frozenset({alpha})})
         self.assertEqual(abap.generate_arguments(beta), {frozenset({beta})})
@@ -589,7 +589,7 @@ class TestABAPlus(unittest.TestCase):
         rules = {rule1, rule2, rule3, rule4, rule5, rule6,
                  rule7, rule8, rule9, rule10, rule11, rule12}
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertEqual(abap.generate_arguments(alpha), {frozenset({alpha})})
         self.assertEqual(abap.generate_arguments(beta), {frozenset({beta})})
@@ -624,7 +624,7 @@ class TestABAPlus(unittest.TestCase):
 
         rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules)
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
         self.assertEqual(abap.generate_arguments(alpha), {frozenset({alpha})})
         self.assertEqual(abap.generate_arguments(beta), {frozenset({beta})})
@@ -713,11 +713,90 @@ class TestABAPlus(unittest.TestCase):
         rule = Rule({a}, b.contrary())
         rules = {rule}
 
-        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences = {})
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences = set())
 
         asp = ASPARTIX_Interface(abap)
-
         asp.generate_input_file_for_clingo("test.lp")
+
         adm_ext =  asp.calculate_admissible_extensions("test.lp")
 
         self.assertEqual(adm_ext, {frozenset({a})})
+
+    def test_simple_calculate_stable_extensions1(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        assumptions = {a, b}
+
+        rule = Rule({a}, b.contrary())
+        rules = {rule}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
+
+        asp = ASPARTIX_Interface(abap)
+        asp.generate_input_file_for_clingo("test.lp")
+
+        stable_ext = asp.calculate_stable_extensions("test.lp")
+
+        self.assertEqual(stable_ext, {frozenset({a})})
+
+    def test_calculate_stable_extensions_none_exists(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        assumptions = {a, b, c}
+
+        rule1 = Rule({a}, b.contrary())
+        rule2 = Rule({b}, c.contrary())
+        rule3 = Rule({c}, a.contrary())
+        rules = {rule1, rule2, rule3}
+
+        pref = Preference(b, a, LESS_THAN)
+        preferences = set([pref])
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
+
+        asp = ASPARTIX_Interface(abap)
+        asp.generate_input_file_for_clingo("test.lp")
+
+        stable_ext = asp.calculate_stable_extensions("test.lp")
+
+        self.assertEqual(stable_ext, set())
+
+    #fails
+    def test_calculate_extensions(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        d = Sentence("d")
+        assumptions = {a, b, c, d}
+
+        rule1 = Rule({a}, b.contrary())
+        rule2 = Rule({b}, a.contrary())
+        rule3 = Rule({a}, c.contrary())
+        rule4 = Rule({c}, b.contrary())
+        rules = {rule1, rule2, rule3, rule4}
+
+        pref = Preference(c, b, LESS_THAN)
+        preferences = {pref}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
+
+        asp = ASPARTIX_Interface(abap)
+        asp.generate_input_file_for_clingo("test_calculate_extensions.lp")
+
+
+
+        stable_ext = asp.calculate_stable_extensions("test_calculate_extensions.lp")
+        self.assertEqual(stable_ext, {frozenset([a, d]), frozenset([b, d])})
+
+        complete_ext = asp.calculate_complete_extensions("test_calculate_extensions.lp")
+
+        preferred_ext = asp.calculate_preferred_extensions("test_calculate_extensions.lp")
+
+        grounded_ext = asp.calculate_grounded_extensions("test_calculate_extensions.lp")
+        # external bug: DLV loops:
+        # ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions.lp")
+
+
+
+

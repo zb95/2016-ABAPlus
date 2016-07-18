@@ -1,0 +1,85 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Encoding for ideal extension
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The program ADM:
+%
+%% guess set S \subseteq A
+% in(X) :- not out(X), arg(X).
+% out(X) :- not in(X), arg(X).
+%% cf
+% :- in(X), in(Y), att(X,Y).
+%% argument x is defeated by S
+% def(X) :- in(Y), att(Y,X).
+%% admissible
+% :- in(X), att(Y,X), not def(Y).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ADM_{in}^bc, where
+%  d_inIn stands for d_in^in
+%  d_outIn stands for d_out^in
+%  d_defeatedIn stands for d_def^in
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+c :- not i.
+i :- not c.
+
+%% guess
+d_inIn(X,Y) :- c, not d_outIn(X,Y), arg(X), arg(Y).
+d_outIn(X,Y) :- c, not d_inIn(X,Y), arg(X), arg(Y).
+
+%% cf
+:- c, d_inIn(X,Z), d_inIn(Y,Z), att(X,Y).
+
+%% defeated argument x
+d_defeatedIn(X,Z) :- c, d_inIn(Y,Z), att(Y,X).
+
+%% adm
+:- c, d_inIn(X,Z), att(Y,X), not d_defeatedIn(Y,Z).
+
+%% brave consequence
+:~ not d_inIn(X,X), arg(X).
+:~ i.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% auxiliary rules for ideal semanitcs
+%% in_minus\1 stands for X_F^-
+%% in_plus\1 stands for X_F^+
+%% q\2 stands for R^*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+in(X) :- d_inIn(X,X).
+in_minus(X) :- arg(X), not in(X).
+not_in_plus(X) :- in(Y), att(X,Y).
+not_in_plus(X) :- in(Y), att(Y,X).
+in_plus(X) :- in(X), not not_in_plus(X).
+q(X,Y) :- att(X,Y), in_plus(X), in_minus(Y).
+q(X,Y) :- att(X,Y), in_minus(X), in_plus(Y).
+
+%% defining an order over in+\1
+lt(X,Y) :- in_plus(X),in_plus(Y), X<Y.
+nsucc(X,Z) :- lt(X,Y), lt(Y,Z).
+succ(X,Y) :- lt(X,Y), not nsucc(X,Y).
+ninf(X) :- lt(Y,X).
+nsup(X) :- lt(X,Y).
+inf(X) :- not ninf(X), in_plus(X).
+sup(X) :- not nsup(X), in_plus(X).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% computing arguments that are in ideal extension using nideal\2
+%% first argument is the iteration step.
+%% 1. iteration: all arguments in X_F^+ which are attacked 
+%%    		 by an unattacked argument are collected.
+%% next iterations: all arg. from previous steps and arg. that
+%% 		    are attacked by an arg. that is unattacked
+%%		    by X_F^+
+%% ideal: arg. that are not excluded from X_F^+ in the final iteration
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+attacked(X) :- q(Y,X).
+nideal(I,Y) :- inf(I), q(Z,Y), in_plus(Y), not attacked(Z).
+nideal(I,Y) :- succ(J,I), nideal(J,Y).
+nideal(I,Y) :- succ(J,I), q(Z,Y), in_plus(Y), not attacked_upto(J,Z).
+attacked_upto(J,Z) :- q(Y,Z), in_plus(Y), not nideal(J,Y), in_plus(J).
+ideal(X) :- in_plus(X), sup(I), not nideal(I,X).
+ 
+%ideal(X)?
