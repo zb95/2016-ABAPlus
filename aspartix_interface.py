@@ -6,7 +6,7 @@ CLINGO = "clingo"
 DLV = "dlv"
 
 CLINGO_COMMAND = "{} {} {} 0"
-DLV_COMMAND = "{} {} {} -filter=in"
+DLV_COMMAND = "{} {} {} -filter=in -n=100"
 
 ADMISSIBLE_FILE = "adm.dl"
 STABLE_FILE= "stable.dl"
