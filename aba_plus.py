@@ -80,7 +80,7 @@ class ABA_Plus:
     def is_preferred(self, assump1, assump2):
         return self.get_relation(assump2, assump1) == LESS_THAN
 
-    def WCP_fulfilled(self, contradictor, assumption, antecedent):
+    def _WCP_fulfilled(self, contradictor, assumption, antecedent):
         negated_contr = contradictor.contrary()
         deduce_from = antecedent.copy()
         deduce_from.add(assumption)
@@ -128,42 +128,61 @@ class ABA_Plus:
             return resulting_combinations
 
         return set()
-
+    '''
     def check_WCP(self):
-        violation_found = False
         for assump in self.assumptions:
             att_rules = self.attacking_rules(assump)
             for rule in att_rules:
+                violation_found = False
+
                 for contradictor in rule.antecedent:
                     result = self.preference_check(assump, contradictor, rule.antecedent, set())
                     if result == False:
                         violation_found = True
                     elif result == CANNOT_BE_DERIVED:
-                        return True
-        return not violation_found
+                        violation_found = False
+                        break
 
-    def preference_check(self, assumption, contradictor, antecedent, sentences_seen):
+                if violation_found:
+                    return False
+
+        return True
+
+    def preference_check(self, assumption, contradictor, antecedent, rules_seen):
         if contradictor in self.assumptions and \
            self.is_preferred(assumption, contradictor) and \
-           not self.WCP_fulfilled(contradictor, assumption, antecedent):
+           not self._WCP_fulfilled(contradictor, assumption, antecedent):
             return False
         elif contradictor not in self.assumptions:
             der_rules = self.deriving_rules(contradictor)
             if not der_rules:
                 return CANNOT_BE_DERIVED
-            sentences_seen.add(contradictor)
             for rule in der_rules:
-                violation_found = False
-                for ant in rule.antecedent:
-                    if ant not in sentences_seen:
-                        result =  self.preference_check(assumption, ant, rule.antecedent, sentences_seen.copy())
+                if rule not in rules_seen:
+                    violation_found = False
+                    _rules_seen = rules_seen.copy()
+                    _rules_seen.add(rule)
+                    for ant in rule.antecedent:
+                        result =  self.preference_check(assumption, ant, rule.antecedent, _rules_seen)
                         if result == False:
                             violation_found = True
                         elif result == CANNOT_BE_DERIVED:
                             violation_found = False
                             break
-                if violation_found == True:
-                    return False
+                    if violation_found == True:
+                        return False
+        return True
+    '''
+
+    def check_WCP(self):
+        for assump in self.assumptions:
+            attacker_sets = self.generate_arguments(assump.contrary())
+            for attacker_set in attacker_sets:
+                for attacker in attacker_set:
+                    if self.is_preferred(assump, attacker) and \
+                       not self._WCP_fulfilled(attacker, assump, set(attacker_set)):
+                        return False
+
         return True
 
     #TODO: rename to avoid confusion between supporting sets and 'arguments' in abstract argumentation
@@ -197,6 +216,7 @@ class ABA_Plus:
                     results = results.union(self.set_combinations(supporting_assumptions))
         return results
 
+    # TODO: fix bug related to order of elments in the sets
     def generate_arguments_and_attacks(self, generate_for):
         deductions = {}
         attacks = set()
