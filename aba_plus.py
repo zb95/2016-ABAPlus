@@ -187,6 +187,7 @@ class ABA_Plus:
 
     # returns rules added
     def check_and_partially_satisfy_WCP(self):
+        rules_added = set()
         for assump in self.assumptions:
             attacker_sets = self.generate_arguments(assump.contrary())
             for attacker_set in attacker_sets:
@@ -195,8 +196,11 @@ class ABA_Plus:
                        not self._WCP_fulfilled(attacker, assump, set(attacker_set)):
                         minimally_preferred = self.get_minimally_preferred(attacker_set)
                         new_attacker_set = attacker_set.union({assump}).difference({minimally_preferred})
-                        self.rules.add(Rule(new_attacker_set, minimally_preferred.contrary()))
+                        new_rule = Rule(new_attacker_set, minimally_preferred.contrary())
+                        self.rules.add(new_rule)
+                        rules_added.add(new_rule)
                         break
+        return rules_added
 
 
     def get_minimally_preferred(self, assumptions):
@@ -207,9 +211,6 @@ class ABA_Plus:
                 minimal = assump
 
         return minimal
-
-
-
 
     #TODO: rename to avoid confusion between supporting sets and 'arguments' in abstract argumentation
     def generate_arguments(self, generate_for):
