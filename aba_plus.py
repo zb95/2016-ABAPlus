@@ -345,6 +345,12 @@ def print_deduction(deduction):
     for c in deduction.conclusion:
         print(c)
 
+def print_attack(attack):
+    print("\nattacker:")
+    print_deduction(attack.attacker)
+    print("\nattackee:")
+    print_deduction(attack.attackee)
+
 
 
 

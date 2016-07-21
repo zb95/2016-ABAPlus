@@ -720,7 +720,7 @@ class TestABAPlus(unittest.TestCase):
 
         adm_ext =  asp.calculate_admissible_extensions("test.lp")
 
-        self.assertEqual(adm_ext, {frozenset({a})})
+        self.assertEqual(adm_ext, {frozenset({a}), frozenset()})
 
     def test_simple_calculate_stable_extensions1(self):
         a = Sentence("a")
@@ -756,13 +756,14 @@ class TestABAPlus(unittest.TestCase):
         abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
 
         asp = ASPARTIX_Interface(abap)
-        asp.generate_input_file_for_clingo("test.lp")
+        asp.generate_input_file_for_clingo("test4.lp")
 
-        stable_ext = asp.calculate_stable_extensions("test.lp")
+        stable_ext = asp.calculate_stable_extensions("test4.lp")
 
         self.assertEqual(stable_ext, set())
 
-    #fails
+    # example 4 from aba+ unit tests
+    # fails
     def test_calculate_extensions(self):
         a = Sentence("a")
         b = Sentence("b")
@@ -794,8 +795,115 @@ class TestABAPlus(unittest.TestCase):
         preferred_ext = asp.calculate_preferred_extensions("test_calculate_extensions.lp")
 
         grounded_ext = asp.calculate_grounded_extensions("test_calculate_extensions.lp")
-        # external bug: DLV loops:
-        # ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions.lp")
+
+        ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions.lp")
+
+    # example 6 from aba+ unit tests
+    def test_calculate_extensions2(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        assumptions = {a, b, c}
+
+        rule1 = Rule({a, c}, b.contrary())
+        rule2 = Rule({b, c}, a.contrary())
+        rule3 = Rule({a, b}, c.contrary())
+        rules = {rule1, rule2, rule3}
+
+        pref1 = Preference(a, b, LESS_THAN)
+        pref2 = Preference(c, b, LESS_THAN)
+        preferences = {pref1, pref2}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
+
+        asp = ASPARTIX_Interface(abap)
+        asp.generate_input_file_for_clingo("test_calculate_extensions2.lp")
+
+        stable_ext = asp.calculate_stable_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(stable_ext, {frozenset([a, b]), frozenset([b, c])})
+
+        complete_ext = asp.calculate_complete_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(complete_ext, {frozenset([b]), frozenset([a, b]), frozenset([b, c])})
+
+        preferred_ext = asp.calculate_preferred_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(preferred_ext, {frozenset([a, b]), frozenset([b, c])})
+
+        grounded_ext = asp.calculate_grounded_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(grounded_ext, {frozenset([b])})
+
+        ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(ideal_ext, {frozenset([b])})
+
+    # example 7 from aba+ unit tests
+    def test_calculate_extensions3(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        assumptions = {a, b, c}
+
+        rule1 = Rule({a, c}, b.contrary())
+        rule2 = Rule({b, c}, a.contrary())
+        rule3 = Rule({b}, c.contrary())
+        rules = {rule1, rule2, rule3}
+
+        pref1 = Preference(a, b, LESS_THAN)
+        pref2 = Preference(c, b, LESS_THAN)
+        preferences = {pref1, pref2}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
+
+        asp = ASPARTIX_Interface(abap)
+        asp.generate_input_file_for_clingo("test_calculate_extensions2.lp")
+
+        stable_ext = asp.calculate_stable_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(stable_ext, {frozenset([a, b])})
+
+        complete_ext = asp.calculate_complete_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(complete_ext, {frozenset([a, b])})
+
+        preferred_ext = asp.calculate_preferred_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(preferred_ext, {frozenset([a, b])})
+
+        grounded_ext = asp.calculate_grounded_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(grounded_ext, {frozenset([a, b])})
+
+        ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(ideal_ext, {frozenset([a, b])})
+
+    # example 8 from aba+ unit tests
+    def test_calculate_extensions4(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        assumptions = {a, b, c}
+
+        rule1 = Rule({a, c}, b.contrary())
+        rule2 = Rule({b, c}, a.contrary())
+        rules = {rule1, rule2}
+
+        pref1 = Preference(a, b, LESS_THAN)
+        pref2 = Preference(b, c, LESS_THAN)
+        preferences = {pref1, pref2}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
+
+        asp = ASPARTIX_Interface(abap)
+        asp.generate_input_file_for_clingo("test_calculate_extensions2.lp")
+
+        stable_ext = asp.calculate_stable_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(stable_ext, {frozenset([b, c])})
+
+        complete_ext = asp.calculate_complete_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(complete_ext, {frozenset([b, c])})
+
+        preferred_ext = asp.calculate_preferred_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(preferred_ext, {frozenset([b, c])})
+
+        grounded_ext = asp.calculate_grounded_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(grounded_ext, {frozenset([b, c])})
+
+        ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions2.lp")
+        self.assertEqual(ideal_ext, {frozenset([b, c])})
 
 
 
