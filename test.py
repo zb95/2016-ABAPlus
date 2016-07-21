@@ -346,6 +346,25 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertTrue(abap.check_WCP())
 
+    def test_check_and_partially_satisfy_WCP(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        assumptions = {a, b, c}
+
+        rule = Rule({b,c}, a.contrary())
+        rules = {rule}
+
+        pref1 = Preference(b, a, LESS_THAN)
+        pref2 = Preference(c, b, LESS_THAN)
+        preferences = {pref1, pref2}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
+
+        abap.check_and_partially_satisfy_WCP()
+
+        self.assertIn(Rule({b,a}, c.contrary()), abap.rules)
+
     def test_set_combinations(self):
         abap = ABA_Plus(set(), set(), set())
 
