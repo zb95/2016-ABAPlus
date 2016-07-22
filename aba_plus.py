@@ -194,7 +194,7 @@ class ABA_Plus:
                 for attacker in attacker_set:
                     if self.is_preferred(assump, attacker) and \
                        not self._WCP_fulfilled(attacker, assump, set(attacker_set)):
-                        minimally_preferred = self.get_minimally_preferred(attacker_set)
+                        minimally_preferred = self.get_minimally_preferred(assump, attacker_set)
                         new_attacker_set = attacker_set.union({assump}).difference({minimally_preferred})
                         new_rule = Rule(new_attacker_set, minimally_preferred.contrary())
                         self.rules.add(new_rule)
@@ -203,8 +203,9 @@ class ABA_Plus:
         return rules_added
 
 
-    def get_minimally_preferred(self, assumptions):
-        it = iter(assumptions)
+    def get_minimally_preferred(self, compare_against, assumptions):
+        filtered = [assump for assump in assumptions if self.is_preferred(compare_against, assump)]
+        it = iter(filtered)
         minimal = next(it)
         for assump in it:
             if self.is_preferred(minimal, assump):

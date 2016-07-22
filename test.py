@@ -365,6 +365,24 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertIn(Rule({b,a}, c.contrary()), abap.rules)
 
+    def test_check_and_partially_satisfy_WCP2(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        assumptions = {a, b, c}
+
+        rule = Rule({a, b}, c.contrary())
+        rules = {rule}
+
+        pref = Preference(a, c, LESS_THAN)
+        preferences = {pref}
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=preferences)
+
+        abap.check_and_partially_satisfy_WCP()
+
+        self.assertIn(Rule({b, c}, a.contrary()), abap.rules)
+
     def test_set_combinations(self):
         abap = ABA_Plus(set(), set(), set())
 
@@ -820,8 +838,6 @@ class TestABAPlus(unittest.TestCase):
 
         asp = ASPARTIX_Interface(abap)
         asp.generate_input_file_for_clingo("test_calculate_extensions.lp")
-
-
 
         stable_ext = asp.calculate_stable_extensions("test_calculate_extensions.lp")
         self.assertEqual(stable_ext, {frozenset([a, d]), frozenset([b, d])})
