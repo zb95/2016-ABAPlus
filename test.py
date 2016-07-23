@@ -1,6 +1,7 @@
 import unittest
 from aba_plus import *
 from aspartix_interface import *
+from abap_parser import *
 
 class TestABAPlus(unittest.TestCase):
 
@@ -957,6 +958,9 @@ class TestABAPlus(unittest.TestCase):
         ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions2.lp")
         self.assertEqual(ideal_ext, {frozenset([b, c])})
 
+    def test_generate_assumptions_from_file(self):
+        abap = generate_aba_plus_framework_from_file("test_generate_assumptions_from_file.pl")
+        self.assertEqual(abap.assumptions, {Sentence("a", False), Sentence("b", False), Sentence("c", False)})
 
 
 

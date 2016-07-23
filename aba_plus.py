@@ -10,6 +10,7 @@ NORMAL_ATK = 1
 REVERSE_ATK = 2
 
 class ABA_Plus:
+    # TODO: remove redundant 'weaker' preferences
     def __init__(self, assumptions, preferences, rules):
         self.assumptions = assumptions
         self.preferences = preferences
