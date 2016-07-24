@@ -986,31 +986,14 @@ class TestABAPlus(unittest.TestCase):
         rule8 = Rule({e}, t)
         rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8}
 
-        diff = abap.rules.symmetric_difference(rules)
-        print("================DIFF=====================")
-        if len(diff) > 1:
-            l = list(diff)
-            print("1:")
-            print("ant:")
-            for ant in l[0].antecedent:
-                print(ant)
-            print("cons:")
-            print(l[0].consequent)
-            print()
-
-            print("2:")
-            print("ant:")
-            for ant in l[1].antecedent:
-                print(ant)
-            print("cons:")
-            print(l[1].consequent)
-            print(l[0].antecedent == l[1].antecedent)
-            print(l[0].consequent == l[1].consequent)
-            print(l[0] == l[1])
-            print(l[0] in rules)
-            print(l[0] in abap.rules)
-
         self.assertEqual(abap.rules, rules)
+
+        pref1 = Preference(a, b, LESS_THAN)
+        pref2 = Preference(c, d, LESS_EQUAL)
+        preferences = {pref1, pref2}
+
+        self.assertEqual(abap.preferences, preferences)
+
 
 
 
