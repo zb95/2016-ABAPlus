@@ -245,7 +245,6 @@ class ABA_Plus:
                     results = results.union(self.set_combinations(supporting_assumptions))
         return results
 
-    # TODO: fix bug related to order of elments in the sets
     def generate_arguments_and_attacks(self, generate_for):
         deductions = {}
         attacks = set()
@@ -316,8 +315,10 @@ class Rule:
         return str(self.__dict__)
 
     def __hash__(self):
-        return (tuple(self.antecedent), self.consequent).__hash__()
+        return (tuple(sort_sentences(list(self.antecedent))),
+                self.consequent).__hash__()
 
+# TODO: remove default values
 class Sentence:
     def __init__(self, symbol=None, is_contrary=False):
         self.symbol = symbol
@@ -383,7 +384,11 @@ class Deduction:
         return str(self.__dict__)
 
     def __hash__(self):
-        return (tuple(self.premise), tuple(self.conclusion)).__hash__()
+        return (tuple(sort_sentences(list(self.premise))),
+                tuple(sort_sentences(list(self.conclusion)))).__hash__()
+
+def sort_sentences(list):
+    return sorted(list, key=lambda sentence: (sentence.symbol, sentence.is_contrary))
 
 ### FOR DEBUGGING ###
 def print_deduction(deduction):
@@ -393,6 +398,13 @@ def print_deduction(deduction):
     print("conclusion:")
     for c in deduction.conclusion:
         print(c)
+
+def print_rule(rule):
+    print("antecedent:")
+    for ant in rule.antecedent:
+        print(ant)
+    print("consequent:")
+    print(rule.consequent)
 
 def print_attack(attack):
     print("\nattacker:")

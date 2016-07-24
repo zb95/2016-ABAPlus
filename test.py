@@ -958,9 +958,60 @@ class TestABAPlus(unittest.TestCase):
         ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions2.lp")
         self.assertEqual(ideal_ext, {frozenset([b, c])})
 
-    def test_generate_assumptions_from_file(self):
+    def test_generate_aba_plus_from_file(self):
         abap = generate_aba_plus_framework_from_file("test_generate_assumptions_from_file.pl")
-        self.assertEqual(abap.assumptions, {Sentence("a", False), Sentence("b", False), Sentence("c", False)})
+
+        a = Sentence("a", False)
+        b = Sentence("b", False)
+        c = Sentence("c", False)
+        d = Sentence("d", False)
+        e = Sentence("e", False)
+        f = Sentence("f", False)
+        assumptions = {a, b, c, d, e, f}
+
+        self.assertEqual(abap.assumptions, assumptions)
+
+        p = Sentence("p", False)
+        r = Sentence("r", False)
+        s = Sentence("s", False)
+        t = Sentence("t", False)
+
+        rule1 = Rule({a, c.contrary()}, p)
+        rule2 = Rule({b, r}, a.contrary())
+        rule3 = Rule({c, s}, a.contrary())
+        rule4 = Rule({c, t}, a.contrary())
+        rule5 = Rule({a}, c.contrary())
+        rule6 = Rule(set(), s)
+        rule7 = Rule({d}, t)
+        rule8 = Rule({e}, t)
+        rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8}
+
+        diff = abap.rules.symmetric_difference(rules)
+        print("================DIFF=====================")
+        if len(diff) > 1:
+            l = list(diff)
+            print("1:")
+            print("ant:")
+            for ant in l[0].antecedent:
+                print(ant)
+            print("cons:")
+            print(l[0].consequent)
+            print()
+
+            print("2:")
+            print("ant:")
+            for ant in l[1].antecedent:
+                print(ant)
+            print("cons:")
+            print(l[1].consequent)
+            print(l[0].antecedent == l[1].antecedent)
+            print(l[0].consequent == l[1].consequent)
+            print(l[0] == l[1])
+            print(l[0] in rules)
+            print(l[0] in abap.rules)
+
+        self.assertEqual(abap.rules, rules)
+
 
 
 

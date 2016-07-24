@@ -11,7 +11,7 @@ LE_PREDICATE = "myPrefLE"
 
 ASSUMP_REGEX = r"myAsm\((.+)\)"
 CONTR_REGEX = r"contrary\((.+),(.+)\)"
-RULE_REGEX = r"myRule\((.+),\[(.+)\]\)"
+RULE_REGEX = r"myRule\((.+),\[(.*)\]\)"
 LT_REGEX = r"myPrefLT\((.+),(.+)\)"
 LE_REGEX = r"myPrefLE\((.+),(.+)\)"
 
@@ -76,10 +76,12 @@ def generate_rules(rule_decls, map):
             consequent_symbol = match.group(1)
             consequent = translate_symbol(consequent_symbol, map)
 
-            antecedent_symbols = match.group(2).split(",")
             antecedent = set()
-            for ant in antecedent_symbols:
-                antecedent.add(translate_symbol(ant, map))
+            if match.group(2) != "":
+                antecedent_symbols = match.group(2).split(",")
+
+                for ant in antecedent_symbols:
+                    antecedent.add(translate_symbol(ant, map))
 
             rules.add(Rule(antecedent, consequent))
 
