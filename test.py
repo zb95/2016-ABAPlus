@@ -1,5 +1,5 @@
 import unittest
-from aba_plus import *
+from aba_plus_ import *
 from aspartix_interface import *
 from abap_parser import *
 
@@ -993,6 +993,29 @@ class TestABAPlus(unittest.TestCase):
         preferences = {pref1, pref2}
 
         self.assertEqual(abap.preferences, preferences)
+
+
+    def test_generate_aba_plus_from_file_duplicate_contraries(self):
+        abap = generate_aba_plus_framework_from_file("test_generate_aba_plus_from_file_duplicate_contraries.pl")
+
+        a = Sentence("a", False)
+        b = Sentence("b", False)
+        c = Sentence("c", False)
+
+        s = Sentence("s", False)
+        t = Sentence("t", False)
+
+        rule1 = Rule({s}, a.contrary())
+        rule2 = Rule({t}, a.contrary())
+        rule3 = Rule({t}, b.contrary())
+        rule4 = Rule({c}, s)
+        rules = {rule1, rule2, rule3, rule4}
+
+        for r in abap.rules:
+            print_rule(r)
+            print()
+
+        self.assertEqual(abap.rules, rules)
 
 
 

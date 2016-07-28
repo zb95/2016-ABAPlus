@@ -1,4 +1,4 @@
-from aba_plus import *
+from aba_plus_ import *
 import re
 
 ASSUMP_PREDICATE = "myAsm"
@@ -15,6 +15,8 @@ RULE_REGEX = r"myRule\((.+),\[(.*)\]\)"
 LT_REGEX = r"myPrefLT\((.+),(.+)\)"
 LE_REGEX = r"myPrefLE\((.+),(.+)\)"
 
+DUPLICATE_USE_FOUND = "_duplicate"
+
 def generate_aba_plus_framework_from_file(filename):
     file = open(filename, 'r')
     input = file.read().replace("\n", "")
@@ -28,10 +30,12 @@ def generate_aba_plus_framework(input_string):
     assumptions = generate_assumptions(assump_declarations)
 
     contr_declarations = [decl for decl in declarations if CONTR_PREDICATE in decl]
-    contr_map = generate_contraries_map(contr_declarations)
+    res = generate_contraries_map(contr_declarations)
+    contr_map = res[0]
+    aux_rules = res[1]
 
     rule_declarations = [decl for decl in declarations if RULE_PREDICATE in decl]
-    rules = generate_rules(rule_declarations, contr_map)
+    rules = generate_rules(rule_declarations, contr_map, aux_rules)
 
     pref_declarations = [decl for decl in declarations if (LT_PREDICATE in decl) or (LE_PREDICATE in decl)]
     preferences = generate_preferences(pref_declarations)
@@ -51,10 +55,12 @@ def generate_assumptions(assump_decls):
 
     return assumptions
 
-# can only assumptions have contraries?
+# TODO: check that only assumptions have contraries
 def generate_contraries_map(contr_decls):
     #maps symbols to contraries
     map = {}
+    duplicate_symbols = set()
+    aux_rules = set()
 
     for decl in contr_decls:
         cleaned_decl = decl.replace(" ", "")
@@ -62,12 +68,47 @@ def generate_contraries_map(contr_decls):
         if match:
             sentence = match.group(1)
             contrary = match.group(2)
-            map[contrary] = Sentence(sentence, True)
 
-    return map
+            if (contrary in map) and (map[contrary] != DUPLICATE_USE_FOUND):
+                print("1")
+                duplicate_symbols.add(sentence)
+                duplicate_symbols.add(contrary)
+                existing_sentence = map[contrary]
+                duplicate_symbols.add(existing_sentence)
+                map[contrary] = DUPLICATE_USE_FOUND
+                aux_rules.add(Rule({Sentence(contrary, False)},
+                              Sentence(existing_sentence, True)))
 
-def generate_rules(rule_decls, map):
-    rules = set()
+            if sentence in map.values():
+                print("2")
+                existing_contrary = list(map)[list(map.values()).index(sentence)]
+                if map[existing_contrary] != DUPLICATE_USE_FOUND:
+                    duplicate_symbols.add(sentence)
+                    duplicate_symbols.add(contrary)
+                    map[existing_contrary] = DUPLICATE_USE_FOUND
+                    duplicate_symbols.add(existing_contrary)
+                    aux_rules.add(Rule({Sentence(existing_contrary, False)},
+                                  Sentence(sentence, True)))
+
+            #if ((contrary in map) and (map[contrary] == DUPLICATE_USE_FOUND)) \
+            #        or (sentence in duplicate_sentences):
+            if (sentence in duplicate_symbols) or (contrary in duplicate_symbols):
+                print("3")
+                map[contrary] = DUPLICATE_USE_FOUND
+                duplicate_symbols.add(contrary)
+                duplicate_symbols.add(sentence)
+                aux_rules.add(Rule({Sentence(contrary, False)},
+                              Sentence(sentence, True)))
+            else:
+                print("4")
+                map[contrary] = sentence
+
+
+
+    return (map, aux_rules)
+
+def generate_rules(rule_decls, map, aux_rules):
+    rules = aux_rules
 
     for decl in rule_decls:
         cleaned_decl = decl.replace(" ", "")
@@ -112,7 +153,7 @@ def generate_preferences(pref_decls):
     return preferences
 
 def translate_symbol(symbol, map):
-    if symbol in map:
-        return map[symbol]
+    if (symbol in map) and (map[symbol] != DUPLICATE_USE_FOUND):
+        return Sentence(map[symbol], True)
     else:
         return Sentence(symbol, False)

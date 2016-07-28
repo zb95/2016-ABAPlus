@@ -6,6 +6,9 @@ myAsm(d).
 myAsm(e).
 myAsm(f).
 
+myPrefLT(a, b).
+myPrefLE(c, d).
+
 contrary(a, q).
 contrary(b, f).
 contrary(c, u).
