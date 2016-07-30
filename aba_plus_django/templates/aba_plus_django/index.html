@@ -7,7 +7,7 @@
 {% load staticfiles %}
 <html>
 	<head>
-		<title>Phantom by HTML5 UP</title>
+		<title>ABA+</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<!--[if lte IE 8]><script src="{% static "assets/js/ie/html5shiv.js" %}"></script><![endif]-->
@@ -51,15 +51,29 @@
 							<header>
 								<h1>Assumption-Based Argumentation with Preferences. </h1>
 								<p>This website (www-abaplus.doc.ic.ac.uk) will carry an interface of a system that implements the computational argumentation formalism ABA+ (K. Cyras, F. Toni: ABA+: Assumption-Based Argumentation with Preferences. The 15th International Conference on Principles of Knowledge Representation and Reasoning (KR 2016)). ABA+ is a novel approach to handling preferences in structured argumentation. It is built upon the well established structured argumentation formalism, Assumption-Based Argumentation (ABA), and extends it with a binary preference relation over assumptions. The preferences are incorporated directly into the attack relation and induce a mechanism to reverse attacks. On this website, the users will be able to specify the individual components of an ABA+ framework (i.e. rules, assumptions with their contraries, and preferences among assumptions), and the extensions (under various semantics) will be generated and visualized.
-<br/>
-									<br/>
-For more information about ABA+ please contact Kristijonas Cyras (k.cyras13@ic.ac.uk) or Francesca Toni (ft@ic.ac.uk). The implementation is carried out by Ziyi Bao (ziyi.bao14@ic.ac.uk), under the Undergraduate Research Opportunities Programme (UROP, http://www.imperial.ac.uk/urop), supervised by K. Cyras and F. Toni. Do not hesitate to contact should you have any questions regarding this website.
+								<br/><br/>
+								For more information about ABA+ please contact Kristijonas Cyras (k.cyras13@ic.ac.uk) or Francesca Toni (ft@ic.ac.uk). The implementation is carried out by Ziyi Bao (ziyi.bao14@ic.ac.uk), under the Undergraduate Research Opportunities Programme (UROP, http://www.imperial.ac.uk/urop), supervised by K. Cyras and F. Toni. Do not hesitate to contact should you have any questions regarding this website.
+								<br/><br/>
+								THE WEBSITE IS UNDER CONSTRUCTION AND WILL BE LIVE SHORTLY.
+								</p>
+							</header>
 
-THE WEBSITE IS UNDER CONSTRUCTION AND WILL BE LIVE SHORTLY.
-</p>
-</header>
+							<form method="post" enctype="multipart/form-data">
+								{% csrf_token %}
+								<input type="file" name="myfile" />
+								<input type="submit" name="submit" value="Upload" />
+							</form>
+						</div>
+					</div>
 
+				<footer id="footer">
+						<div class="inner">
+							<ul class="copyright">
+								<li>&nbsp;                             &copy; Untitled. All rights reserved</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+							</ul>
 
+						</div>
+					</footer>
 
 			</div>
 
@@ -68,7 +82,7 @@ THE WEBSITE IS UNDER CONSTRUCTION AND WILL BE LIVE SHORTLY.
 			<script src="{% static "assets/js/skel.min.js" %}"></script>
 			<script src="{% static "assets/js/util.js" %}"></script>
 			<!--[if lte IE 8]><script src="{% static "assets/js/ie/respond.min.js" %}"></script><![endif]-->
-			<script src="{% static "assets/js/main.js" %}"></script>
+			<script src="{% static 'assets/js/main.js' %}"></script>
 
 	</body>
 </html>

@@ -994,6 +994,28 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertEqual(abap.preferences, preferences)
 
+    def test_generate_aba_plus_from_file2(self):
+        abap = generate_aba_plus_framework_from_file("unit_tests_example6_input.pl")
+
+        a = Sentence("a", False)
+        b = Sentence("b", False)
+        c = Sentence("c", False)
+        assumptions = {a, b, c}
+
+        self.assertEqual(abap.assumptions, assumptions)
+
+        rule1 = Rule({a, c}, b.contrary())
+        rule2 = Rule({b, c}, a.contrary())
+        rule3 = Rule({a, b}, c.contrary())
+        rules = {rule1, rule2, rule3}
+
+        self.assertEqual(abap.rules, rules)
+
+        pref1 = Preference(a, b, LESS_THAN)
+        pref2 = Preference(c, b, LESS_THAN)
+        preferences = {pref1, pref2}
+
+        self.assertEqual(abap.rules, rules)
 
     def test_generate_aba_plus_from_file_duplicate_contraries(self):
         abap = generate_aba_plus_framework_from_file("test_generate_aba_plus_from_file_duplicate_contraries.pl")

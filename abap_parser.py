@@ -19,12 +19,22 @@ DUPLICATE_USE_FOUND = "_duplicate"
 
 def generate_aba_plus_framework_from_file(filename):
     file = open(filename, 'r')
-    input = file.read().replace("\n", "")
+    input = file.read()
     file.close()
     return generate_aba_plus_framework(input)
 
 def generate_aba_plus_framework(input_string):
-    declarations = input_string.split(".")
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    print(input_string)
+    print(input_string.count("\r"))
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    input = input_string.replace('\r', '')
+    input = input.replace('\n', '')
+    #input = input_string.split("\n")
+    #input = ''.join(input)
+    print(input)
+    declarations = input.split(".")
+
 
     assump_declarations = [decl for decl in declarations if ASSUMP_PREDICATE in decl]
     assumptions = generate_assumptions(assump_declarations)
