@@ -28,7 +28,7 @@ class ResultsView(generic.ListView):
     context_object_name = 'input'
 
     def get_queryset(self):
-        return self.request.session['input']
+        return self.request.session['input'].replace("\r", "<br/>")
 
     def get_context_data(self, **kwargs):
         context = super(generic.ListView, self).get_context_data(**kwargs)
@@ -37,16 +37,41 @@ class ResultsView(generic.ListView):
         print(len(abap.assumptions))
         asp = ASPARTIX_Interface(abap)
         asp.generate_input_file_for_clingo(SOLVER_INPUT)
-        stable_ext = asp.calculate_stable_extensions(SOLVER_INPUT)
-        print(stable_ext)
-        context['stable'] = list()
-        for set in stable_ext:
-            symbols = [sentence.symbol for sentence in set]
-            print(symbols)
-            context['stable'].append(symbols)
-        context['grounded'] = asp.calculate_grounded_extensions(SOLVER_INPUT)
-        context['complete'] = asp.calculate_complete_extensions(SOLVER_INPUT)
-        context['preferred'] = asp.calculate_preferred_extensions(SOLVER_INPUT)
-        context['ideal'] = asp.calculate_ideal_extensions(SOLVER_INPUT)
+        context['stable'] = sets_to_str(asp.calculate_stable_extensions(SOLVER_INPUT))
+        context['grounded'] = sets_to_str(asp.calculate_grounded_extensions(SOLVER_INPUT))
+        context['complete'] = sets_to_str(asp.calculate_complete_extensions(SOLVER_INPUT))
+        context['preferred'] = sets_to_str(asp.calculate_preferred_extensions(SOLVER_INPUT))
+        context['ideal'] = sets_to_str(asp.calculate_ideal_extensions(SOLVER_INPUT))
 
         return context
+
+def sets_to_str(sets):
+    str = ""
+
+    it = iter(sets)
+    first_set = next(it, None)
+    if first_set is not None:
+        str += set_to_str(first_set)
+    for set in it:
+        str += ", "
+        str += set_to_str(set)
+
+    return str
+
+def set_to_str(set):
+    str = "{"
+
+    it = iter(set)
+    first_sentence = next(it, None)
+    if first_sentence is not None:
+        str += first_sentence.symbol
+    for sentence in it:
+        str += ", "
+        str += sentence.symbol
+
+    str += "}"
+
+    return str
+
+
+
