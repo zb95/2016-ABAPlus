@@ -34,7 +34,8 @@ class ResultsView(generic.ListView):
         context = super(generic.ListView, self).get_context_data(**kwargs)
         #print(self.request.session['input'])
         abap = generate_aba_plus_framework(self.request.session['input'])
-        print(len(abap.assumptions))
+        attacks = convert_to_attacks_between_sets(abap.generate_arguments_and_attacks_for_contraries()[1])
+        context['attacks'] = [set_atk_to_str(atk) for atk in attacks]
         asp = ASPARTIX_Interface(abap)
         asp.generate_input_file_for_clingo(SOLVER_INPUT)
         context['stable'] = sets_to_str(asp.calculate_stable_extensions(SOLVER_INPUT))
@@ -70,6 +71,21 @@ def set_to_str(set):
         str += sentence.symbol
 
     str += "}"
+
+    return str
+
+def set_atk_to_str(atk):
+    str = ""
+
+    type = atk[2]
+    if type == NORMAL_ATK:
+        str = "Normal Attack: "
+    elif type == REVERSE_ATK:
+        str = "Reverse Attack: "
+
+    str += set_to_str(atk[0])
+    str += " -> "
+    str += set_to_str(atk[1])
 
     return str
 

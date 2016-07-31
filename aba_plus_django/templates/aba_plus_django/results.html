@@ -8,6 +8,11 @@
     Input: <br/>
     {% autoescape off %} {{ input }} {% endautoescape %} <br/> <br/>
 
+    Attacks: <br/>
+    {% for atk in attacks %}
+        {{ atk }} <br/>
+    {% endfor %} <br/> <br/>
+
     Stable extensions: <br/>
     {{ stable }} <br/> <br/>
 

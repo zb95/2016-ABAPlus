@@ -289,8 +289,6 @@ class ABA_Plus:
     def generate_arguments_and_attacks_for_contraries(self):
         return self.generate_arguments_and_attacks([asm.contrary() for asm in self.assumptions])
 
-
-
     def attack_successful(self, attacker, attackee):
         for atk in attacker:
             if self.get_relation(atk, attackee) == LESS_THAN:
@@ -389,6 +387,13 @@ class Deduction:
 
 def sort_sentences(list):
     return sorted(list, key=lambda sentence: (sentence.symbol, sentence.is_contrary))
+
+
+def convert_to_attacks_between_sets(attacks):
+    res = set()
+    for atk in attacks:
+        res.add((frozenset(atk.attacker.premise), frozenset(atk.attackee.premise), atk.type))
+    return res
 
 ### FOR DEBUGGING ###
 def print_deduction(deduction):
