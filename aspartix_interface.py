@@ -94,7 +94,8 @@ class ASPARTIX_Interface:
         results = res.stdout.split(answer_header)
 
         '''
-        res = subprocess.Popen(command.format(input_filename, encoding_filename), stdout=subprocess.PIPE)
+        res = subprocess.Popen(command.format(input_filename, encoding_filename).split(" "),
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = res.stdout.read().decode("utf-8")
 
         if answer_header not in output:
