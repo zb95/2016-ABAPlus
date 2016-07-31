@@ -1,9 +1,14 @@
 from aba_plus_ import *
 import subprocess
 import re
+from sys import platform as _platform
 
-CLINGO = "clingo"
-DLV = "dlv"
+if _platform == "win32":
+    CLINGO = "clingo"
+    DLV = "dlv"
+else:
+    CLINGO = "./clingo"
+    DLV = "./dlv"
 
 CLINGO_COMMAND = "clingo {} {} 0"
 DLV_IDEAL_COMMAND = "dlv {} {} -filter=ideal -n=1"
@@ -82,7 +87,7 @@ class ASPARTIX_Interface:
         return self.calculate_extensions(CLINGO_COMMAND, input_filename, GROUNDED_FILE, CLINGO_ANSWER, CLINGO_REGEX)
 
     def calculate_extensions(self, command, input_filename, encoding_filename, answer_header, regex):
-        res = subprocess.run(command.format(input_filename, encoding_filename),
+        '''res = subprocess.run(command.format(input_filename, encoding_filename),
                              stdout=subprocess.PIPE,
                              universal_newlines=True)
 
@@ -90,8 +95,19 @@ class ASPARTIX_Interface:
         if answer_header not in res.stdout:
             return set()
 
-        extension_sets = set()
+
         results = res.stdout.split(answer_header)
+
+        '''
+        res = subprocess.Popen(command.format(input_filename, encoding_filename), stdout=subprocess.PIPE)
+        output = res.stdout.read().decode("utf-8")
+
+        if answer_header not in output:
+            return set()
+
+        results = output.split(answer_header)
+
+        extension_sets = set()
         answer_sets = results[1:len(results)+1]
         for answer in answer_sets:
            # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
