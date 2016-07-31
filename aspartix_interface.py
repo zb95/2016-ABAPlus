@@ -1,14 +1,9 @@
 from aba_plus_ import *
 import subprocess
 import re
-from sys import platform as _platform
 
-if _platform == "win32":
-    CLINGO = "clingo"
-    DLV = "dlv"
-else:
-    CLINGO = "./clingo"
-    DLV = "./dlv"
+CLINGO = "clingo"
+DLV = "dlv"
 
 CLINGO_COMMAND = "clingo {} {} 0"
 DLV_IDEAL_COMMAND = "dlv {} {} -filter=ideal -n=1"
