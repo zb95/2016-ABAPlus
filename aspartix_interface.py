@@ -2,11 +2,17 @@ from aba_plus_ import *
 import subprocess
 import re
 
+from sys import platform as _platform
+if _platform == "win32":
+    DLV_IDEAL_COMMAND = "dlv {} {} -filter=ideal -n=1"
+else:
+    DLV_IDEAL_COMMAND = "./dlv {} {} -filter=ideal -n=1"
+
 CLINGO = "clingo"
 DLV = "dlv"
 
 CLINGO_COMMAND = "clingo {} {} 0"
-DLV_IDEAL_COMMAND = "dlv {} {} -filter=ideal -n=1"
+
 
 CLINGO_ANSWER = "Answer:"
 DLV_ANSWER = "Best model:"

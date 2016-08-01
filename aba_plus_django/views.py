@@ -42,7 +42,7 @@ class ResultsView(generic.ListView):
         context['grounded'] = sets_to_str(asp.calculate_grounded_extensions(SOLVER_INPUT))
         context['complete'] = sets_to_str(asp.calculate_complete_extensions(SOLVER_INPUT))
         context['preferred'] = sets_to_str(asp.calculate_preferred_extensions(SOLVER_INPUT))
-        #context['ideal'] = sets_to_str(asp.calculate_ideal_extensions(SOLVER_INPUT))
+        context['ideal'] = sets_to_str(asp.calculate_ideal_extensions(SOLVER_INPUT))
 
         return context
 
