@@ -118,9 +118,9 @@ class ASPARTIX_Interface:
             extension = set()
             for m in matches:
                 #print(m)
-                s = self.arguments[int(m)].premise
+                premise = self.arguments[int(m)].premise
                 #print(s)
-                extension = extension.union(s)
+                extension = extension.union(premise)
                 #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
                 #print(extension)
             #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
@@ -128,5 +128,53 @@ class ASPARTIX_Interface:
             extension_sets.add(frozenset(extension))
 
         return extension_sets
+
+    def calculate_admissible_arguments_extensions(self, input_filename):
+        return self.calculate_arguments_extensions(CLINGO_COMMAND, input_filename, ADMISSIBLE_FILE, CLINGO_ANSWER, CLINGO_REGEX)
+
+    def calculate_stable_arguments_extensions(self, input_filename):
+        return self.calculate_arguments_extensions(CLINGO_COMMAND, input_filename, STABLE_FILE, CLINGO_ANSWER, CLINGO_REGEX)
+
+    def calculate_ideal_arguments_extensions(self, input_filename):
+        return self.calculate_arguments_extensions(DLV_IDEAL_COMMAND, input_filename, IDEAL_FILE, DLV_ANSWER, DLV_IDEAL_REGEX)
+
+    def calculate_complete_arguments_extensions(self, input_filename):
+        return self.calculate_arguments_extensions(CLINGO_COMMAND, input_filename, COMPLETE_FILE, CLINGO_ANSWER, CLINGO_REGEX)
+
+    def calculate_preferred_arguments_extensions(self, input_filename):
+        return self.calculate_arguments_extensions(CLINGO_COMMAND, input_filename, PREFERRED_FILE, CLINGO_ANSWER, CLINGO_REGEX)
+
+    def calculate_grounded_arguments_extensions(self, input_filename):
+        return self.calculate_arguments_extensions(CLINGO_COMMAND, input_filename, GROUNDED_FILE, CLINGO_ANSWER, CLINGO_REGEX)
+
+    def calculate_arguments_extensions(self, command, input_filename, encoding_filename, answer_header, regex):
+        res = subprocess.Popen(command.format(input_filename, encoding_filename).split(" "),
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output = res.stdout.read().decode("utf-8")
+
+        if answer_header not in output:
+            return set()
+
+        results = output.split(answer_header)
+
+        # maps sets of sentences to sets of conclusions
+        extension_dict = {}
+        answer_sets = results[1:len(results)+1]
+        for answer in answer_sets:
+            matches = re.findall(regex, answer)
+            extension = set()
+            conclusions = set()
+            for m in matches:
+                arg = self.arguments[int(m)]
+                extension = extension.union(arg.premise)
+                conclusions.add(frozenset(arg.conclusion))
+            extension = frozenset(extension)
+            if extension in extension_dict:
+                extension_dict[extension] =  extension_dict[extension].union(conclusions)
+            else:
+                extension_dict[extension] = conclusions
+
+
+        return extension_dict
 
 

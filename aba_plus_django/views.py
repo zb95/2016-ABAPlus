@@ -8,6 +8,9 @@ from abap_parser import *
 from aspartix_interface import *
 
 SOLVER_INPUT = "input_for_solver.lp"
+TURNSTILE = "&#x22a2;"
+ARROW = "&rarr;"
+OVERLINE = "<span style=\"text-decoration: overline\">{}</span>"
 
 class IndexView(generic.ListView):
     template_name = 'aba_plus_django/index.html'
@@ -38,11 +41,11 @@ class ResultsView(generic.ListView):
         context['attacks'] = [set_atk_to_str(atk) for atk in attacks]
         asp = ASPARTIX_Interface(abap)
         asp.generate_input_file_for_clingo(SOLVER_INPUT)
-        context['stable'] = sets_to_str(asp.calculate_stable_extensions(SOLVER_INPUT))
-        context['grounded'] = sets_to_str(asp.calculate_grounded_extensions(SOLVER_INPUT))
-        context['complete'] = sets_to_str(asp.calculate_complete_extensions(SOLVER_INPUT))
-        context['preferred'] = sets_to_str(asp.calculate_preferred_extensions(SOLVER_INPUT))
-        context['ideal'] = sets_to_str(asp.calculate_ideal_extensions(SOLVER_INPUT))
+        context['stable'] = arguments_extensions_to_str(asp.calculate_stable_arguments_extensions(SOLVER_INPUT))
+        context['grounded'] = arguments_extensions_to_str(asp.calculate_grounded_arguments_extensions(SOLVER_INPUT))
+        context['complete'] = arguments_extensions_to_str(asp.calculate_complete_arguments_extensions(SOLVER_INPUT))
+        context['preferred'] = arguments_extensions_to_str(asp.calculate_preferred_arguments_extensions(SOLVER_INPUT))
+        context['ideal'] = arguments_extensions_to_str(asp.calculate_ideal_arguments_extensions(SOLVER_INPUT))
 
         return context
 
@@ -65,14 +68,20 @@ def set_to_str(set):
     it = iter(set)
     first_sentence = next(it, None)
     if first_sentence is not None:
-        str += first_sentence.symbol
+        str += sentence_to_str(first_sentence)
     for sentence in it:
         str += ", "
-        str += sentence.symbol
+        str += sentence_to_str(sentence)
 
     str += "}"
 
     return str
+
+def sentence_to_str(sentence):
+    if sentence.is_contrary:
+        return OVERLINE.format(sentence.symbol)
+    else:
+        return sentence.symbol
 
 def set_atk_to_str(atk):
     str = ""
@@ -84,10 +93,20 @@ def set_atk_to_str(atk):
         str = "Reverse Attack: "
 
     str += set_to_str(atk[0])
-    str += " -> "
+    str += " {} ".format(ARROW)
     str += set_to_str(atk[1])
 
     return str
 
+def arguments_extensions_to_str(extensions_dict):
+    str = ""
+
+    for extension, conclusions in extensions_dict.items():
+        str += set_to_str(extension)
+        str += " {} ".format(TURNSTILE)
+        str += sets_to_str(conclusions)
+        str += "<br/>"
+
+    return str
 
 

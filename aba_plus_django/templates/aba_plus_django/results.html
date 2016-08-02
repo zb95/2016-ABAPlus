@@ -5,8 +5,9 @@
     <title>Title</title>
 </head>
 <body>
+    {% autoescape off %}
     Input: <br/>
-    {% autoescape off %} {{ input }} {% endautoescape %} <br/> <br/>
+    {{ input }}  <br/> <br/>
 
     Attacks: <br/>
     {% for atk in attacks %}
@@ -27,6 +28,6 @@
 
     Ideal extensions: <br/>
     {{ ideal }} <br/> <br/>
-
+    {% endautoescape %}
 </body>
 </html>
