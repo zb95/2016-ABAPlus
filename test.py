@@ -1108,6 +1108,24 @@ class TestABAPlus(unittest.TestCase):
 
         self.assertEqual(abap.rules, rules)
 
+    def test_generate_all_deductions(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        e = Sentence("e")
+        f = Sentence("f")
+        g = Sentence("g")
+        assumptions = set([a, b, e])
+
+        rule1 = Rule(set([a, b]), c)
+        rule2 = Rule(set([e]), f)
+        rule3 = Rule(set([c, f]), g)
+        rules = (set([rule1, rule2, rule3]))
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
+
+        self.assertEquals(abap.generate_all_deductions({a,b,e}), {a,b,c,e,f,g})
+
 
 
 

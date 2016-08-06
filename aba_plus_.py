@@ -92,7 +92,8 @@ class ABA_Plus:
     def deduction_exists(self, to_deduce, deduce_from):
         rules_applied = set()
         deduced = deduce_from.copy()
-        while True:
+        new_rule_used = True
+        while new_rule_used:
             new_rule_used = False
             for rule in self.rules:
                 if rule not in rules_applied:
@@ -103,9 +104,23 @@ class ABA_Plus:
                         else:
                             deduced.add(rule.consequent)
                         rules_applied.add(rule)
-            if not new_rule_used:
-                break
+
         return False
+
+    def generate_all_deductions(self, deduce_from):
+        rules_applied = set()
+        deduced = deduce_from.copy()
+        new_rule_used = True
+        while new_rule_used:
+            new_rule_used = False
+            for rule in self.rules:
+                if rule not in rules_applied:
+                    if rule.antecedent.issubset(deduced):
+                        new_rule_used = True
+                        deduced.add(rule.consequent)
+                        rules_applied.add(rule)
+
+        return deduced
 
     def direct_decution_exists(self, to_deduce, deduce_from):
         for rule in self.rules:
@@ -246,49 +261,6 @@ class ABA_Plus:
                     results = results.union(self.set_combinations(supporting_assumptions))
         return results
 
-    '''
-    def generate_arguments_and_attacks(self, generate_for):
-        deductions = {}
-        attacks = set()
-
-        # generate trivial deductions for all assumptions:
-        for assumption in self.assumptions:
-            deductions[assumption] = set()
-            deductions[assumption].add(Deduction({assumption}, {assumption}))
-            #print(next(iter(deductions[assumption])))
-
-        # generate supporting assumptions
-        for sentence in generate_for:
-            args = self.generate_arguments(sentence)
-            if args:
-                deductions[sentence] = set()
-
-                for arg in args:
-                    arg_deduction = Deduction(arg, {sentence})
-                    deductions[sentence].add(arg_deduction)
-
-                    if sentence.is_contrary and sentence.contrary() in self.assumptions:
-                        trivial_arg = Deduction({sentence.contrary()}, {sentence.contrary()})
-                        if self.attack_successful(arg, sentence.contrary()):
-                            attacks.add(Attack(arg_deduction, trivial_arg, NORMAL_ATK))
-                        else:
-                            attacks.add(Attack(trivial_arg, arg_deduction, REVERSE_ATK))
-
-        # generate attacks between supporting sets
-        for _, deduction_set in deductions.items():
-            for deduction in deduction_set:
-                for sentence in deduction.premise:
-                    if sentence.contrary() in deductions:
-                        attacking_args = deductions[sentence.contrary()]
-                        for attacking_arg in attacking_args:
-                            if self.attack_successful(attacking_arg.premise, sentence):
-                                attacks.add(Attack(attacking_arg, deduction, NORMAL_ATK))
-                            else:
-                                attacks.add(Attack(deduction, attacking_arg, REVERSE_ATK))
-
-        return (deductions, attacks)
-    '''
-
     def generate_arguments_and_attacks(self, generate_for):
         deductions = {}
         attacks = set()
@@ -345,13 +317,6 @@ class ABA_Plus:
         print()
 
         all_deductions = ft.reduce(lambda x, y: x.union(y), deductions.values())
-        '''
-        for deduction in all_deductions:
-            for sentence in deduction.premise:
-                if sentence in reverse_atk_map:
-                    attacks = attacks.union(self.generate_reverse_attacks(deduction, reverse_atk_map[sentence], all_deductions))
-        '''
-
         for r_attackee, r_attacker_sets in reverse_atk_map.items():
             attackees = [ded for ded in all_deductions if r_attackee.issubset(ded.premise)]
             for r_attacker in r_attacker_sets:
@@ -364,17 +329,7 @@ class ABA_Plus:
             print_attack(atk)
         print()
 
-        return (deductions, attacks)
-
-    def generate_reverse_attacks(self, attackee, reverse_attackers, deductions):
-        attacks = set()
-        for deduction in deductions:
-            for r in reverse_attackers:
-                if r.issubset(deduction.premise):
-                    attacks.add(Attack(deduction, attackee, REVERSE_ATK))
-
-        return attacks
-
+        return (deductions, attacks, all_deductions)
 
     def generate_arguments_and_attacks_for_contraries(self):
         return self.generate_arguments_and_attacks([asm.contrary() for asm in self.assumptions])

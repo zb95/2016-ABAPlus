@@ -104,7 +104,7 @@ def arguments_extensions_to_str(extensions_dict):
     for extension, conclusions in extensions_dict.items():
         str += set_to_str(extension)
         str += " {} ".format(TURNSTILE)
-        str += sets_to_str(conclusions)
+        str += set_to_str(conclusions)
         str += "<br/>"
 
     return str

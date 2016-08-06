@@ -73,8 +73,8 @@ class ASPARTIX_Interface:
 
     def generate_input_file_for_clingo(self, filename):
         res = self.aba_plus.generate_arguments_and_attacks_for_contraries()
-        deductions = res[0]
-        self.attacks = res[1]
+        deductions = res[2]
+        attacks = res[1]
         #for atk in self.attacks:
          #   print_attack(atk)
           #  print()
@@ -86,21 +86,27 @@ class ASPARTIX_Interface:
         '''
         #maps arguments to indices, which are used to represent the arguments in the input file
         self.arguments = []
-        for _, deduction_set in deductions.items():
-            for deduction in deduction_set:
-                self.arguments.append(deduction)
+        for deduction in deductions:
+            if deduction.premise not in self.arguments:
+                self.arguments.append(deduction.premise)
+
+        self.attacks = set()
+        for atk in attacks:
+            self.attacks.add((frozenset(atk.attacker.premise),
+                              frozenset(atk.attackee.premise)))
 
         for i in range(0,len(self.arguments)):
             print(i)
-            print_deduction(self.arguments[i])
+            print(format_set(self.arguments[i]))
+
         f = open(filename, 'w')
 
         for idx in range(0, len(self.arguments)):
             f.write("arg({}).\n".format(idx))
 
         for atk in self.attacks:
-            idx_attacker = self.arguments.index(atk.attacker)
-            idx_attackee = self.arguments.index(atk.attackee)
+            idx_attacker = self.arguments.index(atk[0])
+            idx_attackee = self.arguments.index(atk[1])
             f.write("att({}, {}).\n".format(idx_attacker, idx_attackee))
 
         f.close()
@@ -156,9 +162,9 @@ class ASPARTIX_Interface:
             extension = set()
             for m in matches:
                 #print(m)
-                premise = self.arguments[int(m)].premise
+                arg = self.arguments[int(m)]
                 #print(s)
-                extension = extension.union(premise)
+                extension = extension.union(arg)
                 #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
                 #print(extension)
             #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
@@ -204,14 +210,13 @@ class ASPARTIX_Interface:
             conclusions = set()
             for m in matches:
                 arg = self.arguments[int(m)]
-                extension = extension.union(arg.premise)
-                conclusions.add(frozenset(arg.conclusion))
+                extension = extension.union(arg)
+            conclusions = self.aba_plus.generate_all_deductions(extension)
             extension = frozenset(extension)
             if extension in extension_dict:
                 extension_dict[extension] =  extension_dict[extension].union(conclusions)
             else:
                 extension_dict[extension] = conclusions
-
 
         return extension_dict
 
