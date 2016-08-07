@@ -2225,7 +2225,7 @@
 		padding: 0;
 		min-height: 3.75em;
 	}
-
+	/*
 	input[type="checkbox"],
 	input[type="radio"] {
 		-moz-appearance: none;
@@ -2298,7 +2298,7 @@
 
 	input[type="radio"] + label:before {
 		border-radius: 100%;
-	}
+	}*/
 
 /* Box */
 

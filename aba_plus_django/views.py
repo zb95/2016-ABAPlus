@@ -24,6 +24,13 @@ class IndexView(generic.ListView):
         for chunk in file.chunks():
             str += chunk.decode("utf-8")
         request.session['input'] = str
+
+        if "auto_WCP" in request.POST:
+            print("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUchecked")
+            request.session['auto_WCP'] = True
+        else:
+            request.session['auto_WCP'] = False
+
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
 class ResultsView(generic.ListView):
@@ -41,11 +48,21 @@ class ResultsView(generic.ListView):
         attacks = convert_to_attacks_between_sets(abap.generate_arguments_and_attacks_for_contraries()[1])
         context['attacks'] = [set_atk_to_str(atk) for atk in attacks]
 
-        WCP_fulfilled = abap.check_WCP()
-        if WCP_fulfilled:
-            context['WCP'] = "The Weak Contraposition is fulfilled"
+        print(self.request.session['auto_WCP'])
+        if self.request.session['auto_WCP']:
+            rules_added = abap.check_and_partially_satisfy_WCP()
+            if rules_added:
+                context['rules_added'] = rules_to_str(rules_added)
+            else:
+                context['WCP'] = "The Weak Contraposition is fulfilled"
         else:
-            context['WCP'] = "The Weak Contraposition is not fulfilled"
+            WCP_fulfilled = abap.check_WCP()
+            if WCP_fulfilled:
+                print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+                context['WCP'] = "The Weak Contraposition is fulfilled"
+            else:
+                print("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
+                context['WCP'] = "The Weak Contraposition is not fulfilled"
 
         asp = ASPARTIX_Interface(abap)
         asp.generate_input_file_for_clingo(SOLVER_INPUT)
@@ -115,6 +132,24 @@ def arguments_extensions_to_str(extensions_dict):
         str += " {} ".format(TURNSTILE)
         str += set_to_str(conclusions)
         str += "<br/>"
+
+    return str
+
+def rules_to_str(rules):
+    str = ""
+
+    for rule in rules:
+        str += rule_to_str(rule)
+
+    return str
+
+def rule_to_str(rule):
+    str = ""
+
+    str += set_to_str(rule.antecedent)
+    str += " {} ".format(ARROW)
+    str += sentence_to_str(rule.consequent)
+    str += "<br/>"
 
     return str
 

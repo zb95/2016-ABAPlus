@@ -12,7 +12,9 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<!--[if lte IE 8]><script src="{% static "assets/js/ie/html5shiv.js" %}"></script><![endif]-->
 		<link rel="stylesheet" href="{% static "assets/css/main.css" %}" />
-		<link rel="stylesheet" href="{% static "assets/css/font-awesome.min.css" %}">
+		<link rel="stylesheet" href="{% static "assets
+		<link rel="stylesheet" href="../../static/assets/css/main.css">
+		/css/font-awesome.min.css" %}">
 		<!--[if lte IE 9]><link rel="stylesheet" href="{% static "assets/css/ie9.css" %}" /><![endif]-->
 		<!--[if lte IE 8]><link rel="stylesheet" href="{% static "assets/css/ie8.css" %}" /><![endif]-->
 	</head>
@@ -60,6 +62,7 @@
 
 							<form method="post" enctype="multipart/form-data">
 								{% csrf_token %}
+								<input type="checkbox" name="auto_WCP"> Automatically partially satisfy Weak Contraposition<br>
 								<input type="file" name="myfile" />
 								<input type="submit" name="submit" value="Upload" />
 							</form>

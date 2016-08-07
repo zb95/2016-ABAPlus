@@ -9,7 +9,12 @@
     Input: <br/>
     {{ input }}  <br/> <br/>
 
-    {{ WCP }}  <br/> <br/>
+    {% if rules_added %}
+        Rules added: <br/>
+        {{ rules_added}}
+    {% else %}
+        {{ WCP }}
+    {% endif %} <br/> <br/>
 
     Attacks: <br/>
     {% for atk in attacks %}

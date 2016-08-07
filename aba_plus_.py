@@ -308,6 +308,7 @@ class ABA_Plus:
                             else:
                                 attacks.add(Attack(deduction, attacking_arg, REVERSE_ATK))
 
+        '''
         for k, v in reverse_atk_map.items():
             print("Reverse Attackee:")
             print(format_set(k))
@@ -315,6 +316,7 @@ class ABA_Plus:
                 print("Reverse Attacker")
                 print(format_sentence(reverse_attacker))
         print()
+        '''
 
         all_deductions = ft.reduce(lambda x, y: x.union(y), deductions.values())
         for r_attackee, r_attacker_sets in reverse_atk_map.items():
@@ -325,10 +327,11 @@ class ABA_Plus:
                     for attacker in attackers:
                         attacks.add(Attack(attacker, attackee, REVERSE_ATK))
 
+        '''
         for atk in attacks:
             print_attack(atk)
         print()
-
+        '''
         return (deductions, attacks, all_deductions)
 
     def generate_arguments_and_attacks_for_contraries(self):
