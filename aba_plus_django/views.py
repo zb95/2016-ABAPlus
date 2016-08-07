@@ -37,8 +37,16 @@ class ResultsView(generic.ListView):
         context = super(generic.ListView, self).get_context_data(**kwargs)
         #print(self.request.session['input'])
         abap = generate_aba_plus_framework(self.request.session['input'])
+
         attacks = convert_to_attacks_between_sets(abap.generate_arguments_and_attacks_for_contraries()[1])
         context['attacks'] = [set_atk_to_str(atk) for atk in attacks]
+
+        WCP_fulfilled = abap.check_WCP()
+        if WCP_fulfilled:
+            context['WCP'] = "The Weak Contraposition is fulfilled"
+        else:
+            context['WCP'] = "The Weak Contraposition is not fulfilled"
+
         asp = ASPARTIX_Interface(abap)
         asp.generate_input_file_for_clingo(SOLVER_INPUT)
         context['stable'] = arguments_extensions_to_str(asp.calculate_stable_arguments_extensions(SOLVER_INPUT))
@@ -46,6 +54,7 @@ class ResultsView(generic.ListView):
         context['complete'] = arguments_extensions_to_str(asp.calculate_complete_arguments_extensions(SOLVER_INPUT))
         context['preferred'] = arguments_extensions_to_str(asp.calculate_preferred_arguments_extensions(SOLVER_INPUT))
         context['ideal'] = arguments_extensions_to_str(asp.calculate_ideal_arguments_extensions(SOLVER_INPUT))
+
 
         return context
 
