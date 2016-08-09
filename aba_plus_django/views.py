@@ -1,6 +1,7 @@
 from django.views import generic
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
+from django.shortcuts import render
 import requests
 
 from aba_plus_ import *
@@ -18,7 +19,7 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         return None
 
-    def post(self, request):
+    def post(self, request, **kwargs):
         file = request.FILES['myfile']
         str = ""
         for chunk in file.chunks():
@@ -26,11 +27,17 @@ class IndexView(generic.ListView):
         request.session['input'] = str
 
         if "auto_WCP" in request.POST:
-            print("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUchecked")
             request.session['auto_WCP'] = True
         else:
             request.session['auto_WCP'] = False
-
+        '''
+        try:
+            request.session['abap'] = generate_aba_plus_framework(self.request.session['input'])
+        except CyclicPreferenceException:
+            return render(self.request, template_name='aba_plus_django/error_msg.html', context={'message': 'Cycle in preferences detected!'})
+        else:
+            return HttpResponseRedirect(reverse('aba_plus_django:results'))
+        '''
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
 class ResultsView(generic.ListView):
@@ -42,9 +49,7 @@ class ResultsView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(generic.ListView, self).get_context_data(**kwargs)
-        #print(self.request.session['input'])
         abap = generate_aba_plus_framework(self.request.session['input'])
-
         attacks = convert_to_attacks_between_sets(abap.generate_arguments_and_attacks_for_contraries()[1])
         context['attacks'] = [set_atk_to_str(atk) for atk in attacks]
 
@@ -66,8 +71,6 @@ class ResultsView(generic.ListView):
 
         asp = ASPARTIX_Interface(abap)
         asp.generate_input_file_for_clingo(SOLVER_INPUT)
-        print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
-        print(asp.calculate_stable_arguments_extensions(SOLVER_INPUT))
         context['stable'] = arguments_extensions_to_str(asp.calculate_stable_arguments_extensions(SOLVER_INPUT))
         context['grounded'] = arguments_extensions_to_str(asp.calculate_grounded_arguments_extensions(SOLVER_INPUT))
         context['complete'] = arguments_extensions_to_str(asp.calculate_complete_arguments_extensions(SOLVER_INPUT))
@@ -75,6 +78,9 @@ class ResultsView(generic.ListView):
         context['ideal'] = arguments_extensions_to_str(asp.calculate_ideal_arguments_extensions(SOLVER_INPUT))
 
         return context
+
+
+
 
 def sets_to_str(sets):
     str = ""
@@ -128,8 +134,6 @@ def set_atk_to_str(atk):
 def arguments_extensions_to_str(extensions_dict):
     str = ""
 
-    print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
-    print(extensions_dict.items())
     for extension, conclusions in extensions_dict.items():
         str += set_to_str(extension)
         str += " {} ".format(TURNSTILE)

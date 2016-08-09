@@ -49,6 +49,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'aba_plus_django.middleware.exception_handler.ExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'aba_plus.urls'

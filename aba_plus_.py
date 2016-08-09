@@ -17,7 +17,8 @@ class ABA_Plus:
         self.preferences = preferences
         self.rules = rules
 
-        self.calc_transitive_closure()
+        if not self.calc_transitive_closure():
+            raise CyclicPreferenceException("Cycle in preferences detected!")
 
     # returns False if error with preferences, e.g. a < a, True otherwise
     def calc_transitive_closure(self):
@@ -35,6 +36,7 @@ class ABA_Plus:
         for i in range(0, m):
             for j in range(0, m):
                 relation = closed_matrix[i][j]
+                # cycle detected
                 if i == j and relation == LESS_THAN:
                     return False
                 if i != j and relation != NO_RELATION:
@@ -438,6 +440,9 @@ class Deduction:
     def __hash__(self):
         return (tuple(sort_sentences(list(self.premise))),
                 tuple(sort_sentences(list(self.conclusion)))).__hash__()
+
+class CyclicPreferenceException(Exception):
+    pass
 
 def sort_sentences(list):
     return sorted(list, key=lambda sentence: (sentence.symbol, sentence.is_contrary))
