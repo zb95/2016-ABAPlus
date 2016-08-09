@@ -66,12 +66,13 @@ class ResultsView(generic.ListView):
 
         asp = ASPARTIX_Interface(abap)
         asp.generate_input_file_for_clingo(SOLVER_INPUT)
+        print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
+        print(asp.calculate_stable_arguments_extensions(SOLVER_INPUT))
         context['stable'] = arguments_extensions_to_str(asp.calculate_stable_arguments_extensions(SOLVER_INPUT))
         context['grounded'] = arguments_extensions_to_str(asp.calculate_grounded_arguments_extensions(SOLVER_INPUT))
         context['complete'] = arguments_extensions_to_str(asp.calculate_complete_arguments_extensions(SOLVER_INPUT))
         context['preferred'] = arguments_extensions_to_str(asp.calculate_preferred_arguments_extensions(SOLVER_INPUT))
         context['ideal'] = arguments_extensions_to_str(asp.calculate_ideal_arguments_extensions(SOLVER_INPUT))
-
 
         return context
 
@@ -127,6 +128,8 @@ def set_atk_to_str(atk):
 def arguments_extensions_to_str(extensions_dict):
     str = ""
 
+    print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+    print(extensions_dict.items())
     for extension, conclusions in extensions_dict.items():
         str += set_to_str(extension)
         str += " {} ".format(TURNSTILE)

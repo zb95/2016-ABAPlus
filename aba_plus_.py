@@ -350,9 +350,8 @@ class ABA_Plus:
                 res.add(atk)
         return res
 
-    def generate_attack(self, deduction):
-        for p in deduction.premise:
-            pass
+    def generate_attack(self, attacker, attackee):
+        all_deductions = self.generate_all_deductions(attacker)
 
 
 class Rule:

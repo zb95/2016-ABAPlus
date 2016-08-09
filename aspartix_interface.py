@@ -197,7 +197,7 @@ class ASPARTIX_Interface:
         output = res.stdout.read().decode("utf-8")
 
         if answer_header not in output:
-            return set()
+            return {}
 
         results = output.split(answer_header)
 
@@ -217,7 +217,6 @@ class ASPARTIX_Interface:
                 extension_dict[extension] =  extension_dict[extension].union(conclusions)
             else:
                 extension_dict[extension] = conclusions
-
         return extension_dict
 
 
