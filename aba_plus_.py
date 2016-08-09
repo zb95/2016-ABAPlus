@@ -17,10 +17,19 @@ class ABA_Plus:
         self.preferences = preferences
         self.rules = rules
 
+        if not self.is_flat():
+            raise  NonFlatException("The framework is not flat!")
         if not self.calc_transitive_closure():
             raise CyclicPreferenceException("Cycle in preferences detected!")
 
-    # returns False if error with preferences, e.g. a < a, True otherwise
+    def is_flat(self):
+        for rule in self.rules:
+            if rule.consequent in self.assumptions:
+                return False
+
+        return True
+
+    # returns False if error in preferences, e.g. a < a, True otherwise
     def calc_transitive_closure(self):
         assump_list = list(self.assumptions)
         m = len(assump_list)
@@ -442,7 +451,12 @@ class Deduction:
                 tuple(sort_sentences(list(self.conclusion)))).__hash__()
 
 class CyclicPreferenceException(Exception):
-    pass
+    def __init__(self, message):
+        self.message = message
+
+class NonFlatException(Exception):
+    def __init__(self, message):
+        self.message = message
 
 def sort_sentences(list):
     return sorted(list, key=lambda sentence: (sentence.symbol, sentence.is_contrary))
