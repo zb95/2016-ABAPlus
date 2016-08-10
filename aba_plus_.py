@@ -18,7 +18,9 @@ class ABA_Plus:
         self.rules = rules
 
         if not self.is_flat():
-            raise  NonFlatException("The framework is not flat!")
+            raise NonFlatException("The framework is not flat!")
+        if not self.preferences_only_between_assumptions():
+            raise InvalidPreferenceException("Non-assumption in preference detected!")
         if not self.calc_transitive_closure():
             raise CyclicPreferenceException("Cycle in preferences detected!")
 
@@ -27,6 +29,13 @@ class ABA_Plus:
             if rule.consequent in self.assumptions:
                 return False
 
+        return True
+
+    def preferences_only_between_assumptions(self):
+        for pref in self.preferences:
+            if pref.assump1 not in self.assumptions or \
+               pref.assump2 not in self.assumptions:
+                return False
         return True
 
     # returns False if error in preferences, e.g. a < a, True otherwise
@@ -455,6 +464,10 @@ class CyclicPreferenceException(Exception):
         self.message = message
 
 class NonFlatException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+class InvalidPreferenceException(Exception):
     def __init__(self, message):
         self.message = message
 
