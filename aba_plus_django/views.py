@@ -49,10 +49,18 @@ class ResultsView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(generic.ListView, self).get_context_data(**kwargs)
-        abap = generate_aba_plus_framework(self.request.session['input'])
+
+        if self.request.session['auto_WCP']:
+            abap = generate_aba_plus_framework(self.request.session['input'])
+            context['rules_added'] = rules_to_str(abap.check_all(auto_WCP = True))
+        else:
+            abap = generate_aba_plus_framework(self.request.session['input'])
+            abap.check_all()
+
         attacks = convert_to_attacks_between_sets(abap.generate_arguments_and_attacks_for_contraries()[1])
         context['attacks'] = [set_atk_to_str(atk) for atk in attacks]
 
+        '''
         print(self.request.session['auto_WCP'])
         if self.request.session['auto_WCP']:
             rules_added = abap.check_and_partially_satisfy_WCP()
@@ -68,6 +76,7 @@ class ResultsView(generic.ListView):
             else:
                 print("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
                 context['WCP'] = "The Weak Contraposition is not fulfilled"
+        '''
 
         asp = ASPARTIX_Interface(abap)
         asp.generate_input_file_for_clingo(SOLVER_INPUT)
@@ -78,6 +87,12 @@ class ResultsView(generic.ListView):
         context['ideal'] = arguments_extensions_to_str(asp.calculate_ideal_arguments_extensions(SOLVER_INPUT))
 
         return context
+
+    def post(self, request, **kwargs):
+        if 'auto_WCP' in self.request.POST:
+            print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
+            self.request.session['auto_WCP'] = True
+        return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
 
 

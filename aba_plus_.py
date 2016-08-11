@@ -17,12 +17,24 @@ class ABA_Plus:
         self.preferences = preferences
         self.rules = rules
 
+    def check_all(self, **kwargs):
+        auto_WCP = kwargs.get('auto_WCP', False)
+
         if not self.is_flat():
             raise NonFlatException("The framework is not flat!")
+
         if not self.preferences_only_between_assumptions():
             raise InvalidPreferenceException("Non-assumption in preference detected!")
+
         if not self.calc_transitive_closure():
             raise CyclicPreferenceException("Cycle in preferences detected!")
+
+        if auto_WCP:
+            return self.check_and_partially_satisfy_WCP()
+        elif not self.check_WCP():
+            raise WCPViolationException("Weak Contraposition is not satisfied!")
+
+        return None
 
     def is_flat(self):
         for rule in self.rules:
@@ -470,6 +482,11 @@ class NonFlatException(Exception):
 class InvalidPreferenceException(Exception):
     def __init__(self, message):
         self.message = message
+
+class WCPViolationException(Exception):
+    def __init__(self, message):
+        self.message = message
+
 
 def sort_sentences(list):
     return sorted(list, key=lambda sentence: (sentence.symbol, sentence.is_contrary))

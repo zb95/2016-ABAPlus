@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WCP not satisfied</title>
+</head>
+<body>
+    The Weak Contraposition is not satisifed. <br/>
+    <form method="post" action="{% url 'aba_plus_django:results' %}">
+        {% csrf_token %}
+        <input type="submit" name="auto_WCP" value="automatically partially satisfy WCP" />
+    </form>
+</body>
+</html>
