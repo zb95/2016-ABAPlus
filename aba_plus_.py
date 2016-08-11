@@ -17,9 +17,6 @@ class ABA_Plus:
         self.preferences = preferences
         self.rules = rules
 
-    def check_all(self, **kwargs):
-        auto_WCP = kwargs.get('auto_WCP', False)
-
         if not self.is_flat():
             raise NonFlatException("The framework is not flat!")
 
@@ -28,6 +25,9 @@ class ABA_Plus:
 
         if not self.calc_transitive_closure():
             raise CyclicPreferenceException("Cycle in preferences detected!")
+
+    def check_or_auto_WCP(self, **kwargs):
+        auto_WCP = kwargs.get('auto_WCP', False)
 
         if auto_WCP:
             return self.check_and_partially_satisfy_WCP()
@@ -292,7 +292,7 @@ class ABA_Plus:
                 if not args_lacking:
                     results = results.union(self.set_combinations(supporting_assumptions))
         return results
-
+    '''
     def generate_arguments_and_attacks(self, generate_for):
         deductions = {}
         attacks = set()
@@ -340,6 +340,90 @@ class ABA_Plus:
                             else:
                                 attacks.add(Attack(deduction, attacking_arg, REVERSE_ATK))
 
+        ''''''
+        for k, v in reverse_atk_map.items():
+            print("Reverse Attackee:")
+            print(format_set(k))
+            for reverse_attacker in v:
+                print("Reverse Attacker")
+                print(format_sentence(reverse_attacker))
+        print()
+        ''''''
+
+        all_deductions = ft.reduce(lambda x, y: x.union(y), deductions.values())
+        for r_attackee, r_attacker_sets in reverse_atk_map.items():
+            attackees = [ded for ded in all_deductions if r_attackee.issubset(ded.premise)]
+            for r_attacker in r_attacker_sets:
+                attackers = [ded for ded in all_deductions if r_attacker in ded.premise]
+                for attackee in attackees:
+                    for attacker in attackers:
+                        attacks.add(Attack(attacker, attackee, REVERSE_ATK))
+
+        ''''''
+        for atk in attacks:
+            print_attack(atk)
+        print()
+        ''''''
+        return (deductions, attacks, all_deductions)
+    '''
+
+    def generate_arguments_and_attacks(self, generate_for):
+        deductions = {}
+        attacks = set()
+        # maps attackees to attackers in normal attacks
+        atk_map = {}
+        # maps attackees to attackers in reverse attacks
+        reverse_atk_map = {}
+
+        # generate trivial deductions for all assumptions:
+        for assumption in self.assumptions:
+            deductions[assumption] = set()
+            deductions[assumption].add(Deduction({assumption}, {assumption}))
+            # print(next(iter(deductions[assumption])))
+
+        # generate supporting assumptions
+        for sentence in generate_for:
+            args = self.generate_arguments(sentence)
+            if args:
+                deductions[sentence] = set()
+
+                for arg in args:
+                    arg_deduction = Deduction(arg, {sentence})
+                    deductions[sentence].add(arg_deduction)
+
+                    if sentence.is_contrary and sentence.contrary() in self.assumptions:
+                        trivial_arg = Deduction({sentence.contrary()}, {sentence.contrary()})
+
+                        if self.attack_successful(arg, sentence.contrary()):
+                            attacks.add(Attack(arg_deduction, trivial_arg, NORMAL_ATK))
+
+                            f_arg = frozenset(arg)
+                            if sentence.contrary() not in atk_map:
+                                atk_map[sentence.contrary()] = set()
+                            atk_map[sentence.contrary()].add(f_arg)
+
+                        else:
+                            attacks.add(Attack(trivial_arg, arg_deduction, REVERSE_ATK))
+
+                            f_arg = frozenset(arg)
+                            if f_arg not in reverse_atk_map:
+                                reverse_atk_map[f_arg] = set()
+                            reverse_atk_map[f_arg].add(sentence.contrary())
+
+        '''
+        # generate attacks between supporting sets
+        for _, deduction_set in deductions.items():
+            for deduction in deduction_set:
+                for sentence in deduction.premise:
+                    if sentence.contrary() in deductions:
+                        attacking_args = deductions[sentence.contrary()]
+                        for attacking_arg in attacking_args:
+                            if self.attack_successful(attacking_arg.premise, sentence):
+                                attacks.add(Attack(attacking_arg, deduction, NORMAL_ATK))
+                            else:
+                                attacks.add(Attack(deduction, attacking_arg, REVERSE_ATK))
+        '''
+
         '''
         for k, v in reverse_atk_map.items():
             print("Reverse Attackee:")
@@ -349,8 +433,16 @@ class ABA_Plus:
                 print(format_sentence(reverse_attacker))
         print()
         '''
-
         all_deductions = ft.reduce(lambda x, y: x.union(y), deductions.values())
+
+        for n_attackee, n_attacker_sets in atk_map.items():
+            attackees = [ded for ded in all_deductions if n_attackee in ded.premise]
+            for n_attacker in n_attacker_sets:
+                attackers = [ded for ded in all_deductions if n_attacker.issubset(ded.premise)]
+                for attackee in attackees:
+                    for attacker in attackers:
+                        attacks.add(Attack(attacker, attackee, NORMAL_ATK))
+
         for r_attackee, r_attacker_sets in reverse_atk_map.items():
             attackees = [ded for ded in all_deductions if r_attackee.issubset(ded.premise)]
             for r_attacker in r_attacker_sets:

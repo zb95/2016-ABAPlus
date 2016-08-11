@@ -52,10 +52,10 @@ class ResultsView(generic.ListView):
 
         if self.request.session['auto_WCP']:
             abap = generate_aba_plus_framework(self.request.session['input'])
-            context['rules_added'] = rules_to_str(abap.check_all(auto_WCP = True))
+            context['rules_added'] = rules_to_str(abap.check_or_auto_WCP(auto_WCP = True))
         else:
             abap = generate_aba_plus_framework(self.request.session['input'])
-            abap.check_all()
+            abap.check_or_auto_WCP()
 
         attacks = convert_to_attacks_between_sets(abap.generate_arguments_and_attacks_for_contraries()[1])
         context['attacks'] = [set_atk_to_str(atk) for atk in attacks]
