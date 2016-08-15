@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 import requests
+import json
 
 from aba_plus_ import *
 from abap_parser import *
@@ -12,6 +13,7 @@ SOLVER_INPUT = "input_for_solver.lp"
 TURNSTILE = "&#x22a2;"
 ARROW = "&rarr;"
 OVERLINE = "<span style=\"text-decoration: overline\">{}</span>"
+BOTH_ATTACKS = 3
 
 class IndexView(generic.ListView):
     template_name = 'aba_plus_django/index.html'
@@ -57,8 +59,14 @@ class ResultsView(generic.ListView):
             abap = generate_aba_plus_framework(self.request.session['input'])
             abap.check_or_auto_WCP()
 
-        attacks = convert_to_attacks_between_sets(abap.generate_arguments_and_attacks_for_contraries()[1])
-        context['attacks'] = [set_atk_to_str(atk) for atk in attacks]
+        res = abap.generate_arguments_and_attacks_for_contraries()
+
+
+        context['json_input'] = generate_json(res[2], res[1])
+        print(generate_json(res[2], res[1]))
+
+        set_attacks = convert_to_attacks_between_sets(res[1])
+        context['attacks'] = [set_atk_to_str(atk) for atk in set_attacks]
 
         '''
         print(self.request.session['auto_WCP'])
@@ -93,7 +101,6 @@ class ResultsView(generic.ListView):
             print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
             self.request.session['auto_WCP'] = True
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
-
 
 
 
@@ -174,5 +181,38 @@ def rule_to_str(rule):
     str += "<br/>"
 
     return str
+
+
+def generate_json(deductions, attacks):
+    output = {"nodes": list(), "links": list()}
+
+    support_sets = []
+    for ded in deductions:
+        if ded.premise not in support_sets:
+            support_sets.append(ded.premise)
+
+            node = {"name": set_to_str(ded.premise),
+                    "group": 1}
+            output["nodes"].append(node)
+
+    # maps (attacker, attackee) to attack type
+    attack_map = {}
+    for atk in attacks:
+        key = (frozenset(atk.attacker.premise), frozenset(atk.attackee.premise))
+        if key not in attack_map:
+            attack_map[key] = atk.type
+        elif atk.type != attack_map[key]:
+            attack_map[key] = BOTH_ATTACKS
+
+    for k, v in attack_map.items():
+        idx_attacker = support_sets.index(k[0])
+        idx_attackee = support_sets.index(k[1])
+
+        link = {"source": idx_attacker,
+                "target": idx_attackee,
+                "value": v}
+        output["links"].append(link)
+
+    return json.dumps(output)
 
 
