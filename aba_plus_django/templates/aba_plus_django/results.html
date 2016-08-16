@@ -6,12 +6,15 @@
     <style>
 
     .link {
-      stroke: #ccc;
+      stroke: #0f0;
+      fill: none;
+      stroke-width: 2px;
     }
 
     .node text {
       pointer-events: none;
-      font: 10px sans-serif;
+      font: 14px sans-serif;
+      font-weight: bold;
     }
 
     </style>
@@ -28,9 +31,15 @@
 <script>
 
 var width = 960,
-    height = 500
+height = 500;
+
+var color = d3.scale.category20();
+
+var radius = d3.scale.sqrt()
+    .range([0, 6]);
 
 var svg = d3.select("body").append("svg")
+    .attr("style", "outline: thin solid gray;")   
     .attr("width", width)
     .attr("height", height);
 
@@ -40,18 +49,17 @@ var force = d3.layout.force()
     .charge(-100)
     .size([width, height]);
 
-var json = JSON.parse(json_string);
+var graph = JSON.parse(json_string);
 
-
-//d3.json("{% static 'data/abap_graph.json' %}", function(error, json) {
-  //if (error) throw error;
-
+var drawGraph = function(graph) {
   force
-      .nodes(json.nodes)
-      .links(json.links)
+      .nodes(graph.nodes)
+      .links(graph.links)
+      .on("tick", tick)
       .start();
 
-    // build the arrow.
+
+      // build the arrow.
 svg.append("svg:defs").selectAll("marker")
     .data(["end"])      // Different link/path types can be defined here
   .enter().append("svg:marker")    // This section adds in the arrows
@@ -62,14 +70,14 @@ svg.append("svg:defs").selectAll("marker")
     .attr("markerWidth", 6)
     .attr("markerHeight", 6)
     .attr("orient", "auto")
-        .style("fill", "gray")
+        .style("fill", d3.rgb(150,150,150))
   .append("svg:path")
     .attr("d", "M0,-5L10,0L0,5");
 
   var link = svg.selectAll(".link")
-      .data(json.links)
-    .enter().append("line")
-      .attr("class", "link")
+      .data(graph.links)
+    .enter().append("path")
+      .attr("class","link")
           .attr("stroke-dasharray", function(d) {
               switch (d.value) {
                   case 1: //normal attack
@@ -80,40 +88,71 @@ svg.append("svg:defs").selectAll("marker")
                       return "1,0"
               } })
           .attr("marker-end", "url(#end)")
-          .style("stroke", "gray")
+          .style("stroke", d3.rgb(150,150,150))
     .style("stroke-width", 2);
 
   var node = svg.selectAll(".node")
-      .data(json.nodes)
+      .data(graph.nodes)
     .enter().append("g")
       .attr("class", "node")
       .call(force.drag);
 
-  /*node.append("image")
-      .attr("xlink:href", "https://github.com/favicon.ico")
-      .attr("x", -8)
-      .attr("y", -8)
-      .attr("width", 16)
-      .attr("height", 16);*/
   node.append("circle")
-          .attr("r", 8)
-          .attr("fill", function(d) { return d.group == 1 ? d3.rgb(204,0,105) : d3.rgb(64,64,64) });
+      .attr("r", 8)
+      .attr("fill", function(d) { return d.group == 1 ? d3.rgb(204,0,105) : d3.rgb(64,64,64) });
 
   node.append("text")
       .attr("dx", 12)
       .attr("dy", ".35em")
       .text(function(d) { return d.name });
 
-  force.on("tick", function() {
-    link.attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
+  function tick() {
+    link.attr("d", function(d) {
+      var x1 = d.source.x,
+          y1 = d.source.y,
+          x2 = d.target.x,
+          y2 = d.target.y,
+          dx = x2 - x1,
+          dy = y2 - y1,
+          dr = Math.sqrt(dx * dx + dy * dy),
+
+          // Defaults for normal edge.
+          drx = dr,
+          dry = dr,
+          xRotation = 0, // degrees
+          largeArc = 0, // 1 or 0
+          sweep = 1; // 1 or 0
+
+          // Self edge.
+          if ( x1 === x2 && y1 === y2 ) {
+            // Fiddle with this angle to get loop oriented.
+            xRotation = -45;
+
+            // Needs to be 1.
+            largeArc = 1;
+
+            // Change sweep to change orientation of loop.
+            //sweep = 0;
+
+            // Make drx and dry different to get an ellipse
+            // instead of a circle.
+            drx = 30;
+            dry = 20;
+
+            // For whatever reason the arc collapses to a point if the beginning
+            // and ending points of the arc are the same, so kludge it.
+            x2 = x2 + 1;
+            y2 = y2 + 1;
+          }
+
+     return "M" + x1 + "," + y1 + "A" + drx + "," + dry + " " + xRotation + "," + largeArc + "," + sweep + " " + x2 + "," + y2;
+    });
 
     node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-  });
-//});
+  }
+};
 
+drawGraph(graph);
 </script>
 <br/>
 
@@ -148,5 +187,6 @@ svg.append("svg:defs").selectAll("marker")
     Ideal extensions: <br/>
     {{ ideal }} <br/> <br/>
     {% endautoescape %}
+</body>
 </body>
 </html>
