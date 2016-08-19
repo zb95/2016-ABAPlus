@@ -97,7 +97,7 @@ class ResultsView(generic.ListView):
             context['preferred'] = arguments_extensions_to_str_list(asp.calculate_preferred_arguments_extensions(SOLVER_INPUT))
             context['ideal'] = arguments_extensions_to_str_list(asp.calculate_ideal_arguments_extensions(SOLVER_INPUT))
 
-            json_input = generate_json(deductions, attacks, set())
+            json_input = generate_json(deductions, attacks, None)
             context['json_input'] = json_input
             print(json_input)
 
@@ -112,7 +112,7 @@ class ResultsView(generic.ListView):
 
             context['stable'] = arguments_extensions_to_str_list(result[5])
 
-            highlighted_ext = set()
+            highlighted_ext = None
             print("MEEEEEEEEEEEEP")
             print(self.request.session['highlight'])
             if 'highlight' in self.request.session:
@@ -235,7 +235,8 @@ def generate_json(deductions, attacks, highlighted_sentences):
         if ded.premise not in support_sets:
             support_sets.append(ded.premise)
 
-            group = 2 if frozenset(ded.premise).issubset(highlighted_sentences) else 1
+            group = 2 if not (highlighted_sentences is None) \
+                         and frozenset(ded.premise).issubset(highlighted_sentences) else 1
 
             node = {"name": set_to_str(ded.premise),
                     "group": group}
