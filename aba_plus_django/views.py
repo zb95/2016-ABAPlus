@@ -15,6 +15,9 @@ ARROW = "&rarr;"
 OVERLINE = "<span style=\"text-decoration: overline\">{}</span>"
 BOTH_ATTACKS = 3
 
+#maps session keys to calculation results
+results = {}
+
 class IndexView(generic.ListView):
     template_name = 'aba_plus_django/index.html'
 
@@ -40,6 +43,7 @@ class IndexView(generic.ListView):
         else:
             return HttpResponseRedirect(reverse('aba_plus_django:results'))
         '''
+        request.session['compute'] = True
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
 class ResultsView(generic.ListView):
@@ -52,54 +56,89 @@ class ResultsView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(generic.ListView, self).get_context_data(**kwargs)
 
-        if self.request.session['auto_WCP']:
-            abap = generate_aba_plus_framework(self.request.session['input'])
-            context['rules_added'] = rules_to_str(abap.check_or_auto_WCP(auto_WCP = True))
-        else:
-            abap = generate_aba_plus_framework(self.request.session['input'])
-            abap.check_or_auto_WCP()
-
-        res = abap.generate_arguments_and_attacks_for_contraries()
-
-
-        context['json_input'] = generate_json(res[2], res[1])
-        print(generate_json(res[2], res[1]))
-
-        set_attacks = convert_to_attacks_between_sets(res[1])
-        context['attacks'] = [set_atk_to_str(atk) for atk in set_attacks]
-
-        '''
-        print(self.request.session['auto_WCP'])
-        if self.request.session['auto_WCP']:
-            rules_added = abap.check_and_partially_satisfy_WCP()
-            if rules_added:
-                context['rules_added'] = rules_to_str(rules_added)
+        if self.request.session['compute']:
+            self.request.session['compute'] = False
+            if self.request.session['auto_WCP']:
+                abap = generate_aba_plus_framework(self.request.session['input'])
+                context['rules_added'] = rules_to_str(abap.check_or_auto_WCP(auto_WCP = True))
             else:
-                context['WCP'] = "The Weak Contraposition is fulfilled"
-        else:
-            WCP_fulfilled = abap.check_WCP()
-            if WCP_fulfilled:
-                print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-                context['WCP'] = "The Weak Contraposition is fulfilled"
-            else:
-                print("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
-                context['WCP'] = "The Weak Contraposition is not fulfilled"
-        '''
+                abap = generate_aba_plus_framework(self.request.session['input'])
+                abap.check_or_auto_WCP()
 
-        asp = ASPARTIX_Interface(abap)
-        asp.generate_input_file_for_clingo(SOLVER_INPUT)
-        context['stable'] = arguments_extensions_to_str(asp.calculate_stable_arguments_extensions(SOLVER_INPUT))
-        context['grounded'] = arguments_extensions_to_str(asp.calculate_grounded_arguments_extensions(SOLVER_INPUT))
-        context['complete'] = arguments_extensions_to_str(asp.calculate_complete_arguments_extensions(SOLVER_INPUT))
-        context['preferred'] = arguments_extensions_to_str(asp.calculate_preferred_arguments_extensions(SOLVER_INPUT))
-        context['ideal'] = arguments_extensions_to_str(asp.calculate_ideal_arguments_extensions(SOLVER_INPUT))
+            res = abap.generate_arguments_and_attacks_for_contraries()
+            attacks = res[1]
+            deductions = res[2]
+
+            set_attacks = convert_to_attacks_between_sets(res[1])
+            context['attacks'] = [set_atk_to_str(atk) for atk in set_attacks]
+
+            asp = ASPARTIX_Interface(abap)
+            asp.generate_input_file_for_clingo(SOLVER_INPUT)
+
+            stable_ext = asp.calculate_stable_arguments_extensions(SOLVER_INPUT)
+            context['stable'] = arguments_extensions_to_str_list(stable_ext)
+            stable_l = list(stable_ext.keys())
+            stable_list = []
+
+            i = 0
+            for s in stable_l:
+                stable_list.append((i,s))
+                i += 1
+            context['stable_list'] = stable_list
+
+
+
+
+            context['grounded'] = arguments_extensions_to_str_list(asp.calculate_grounded_arguments_extensions(SOLVER_INPUT))
+            context['complete'] = arguments_extensions_to_str_list(asp.calculate_complete_arguments_extensions(SOLVER_INPUT))
+            context['preferred'] = arguments_extensions_to_str_list(asp.calculate_preferred_arguments_extensions(SOLVER_INPUT))
+            context['ideal'] = arguments_extensions_to_str_list(asp.calculate_ideal_arguments_extensions(SOLVER_INPUT))
+
+            json_input = generate_json(deductions, attacks, set())
+            context['json_input'] = json_input
+            print(json_input)
+
+            print(self.request.session.session_key)
+            results[self.request.session.session_key] = (abap, deductions, attacks, stable_l, stable_list, stable_ext)
+        else:
+            print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+            result = results[self.request.session.session_key]
+            set_attacks = convert_to_attacks_between_sets(result[2])
+            context['attacks'] = [set_atk_to_str(atk) for atk in set_attacks]
+
+            context['stable'] = arguments_extensions_to_str_list(result[5])
+
+            highlighted_ext = set()
+            print("MEEEEEEEEEEEEP")
+            print(self.request.session['highlight'])
+            if 'highlight' in self.request.session:
+                print("RRRRRRRFFFFFFFFFFFFFFFFFFF")
+                to_highlight = self.request.session['highlight']
+                print(to_highlight)
+                stable_l = result[3]
+                highlighted_ext = stable_l[to_highlight]
+
+
+            json_input = generate_json(result[1], result[2], highlighted_ext)
+
+            context['stable_list'] = result[4]
+
+            context['json_input'] = json_input
 
         return context
 
     def post(self, request, **kwargs):
+        if self.request.session['compute']:
+            print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
         if 'auto_WCP' in self.request.POST:
             print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
             self.request.session['auto_WCP'] = True
+        elif 'select_extension' in self.request.POST:
+            print("SEEEEEEEEEEEELLLLLLLLEEEEEEEECCCCCCCCCCTTTTTTTTTTT")
+            selection = request.POST['select_extension']
+            print(selection)
+            self.request.session['highlight'] = int(selection)
+            print(self.request.session['highlight'])
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
 
@@ -153,16 +192,17 @@ def set_atk_to_str(atk):
 
     return str
 
-def arguments_extensions_to_str(extensions_dict):
-    str = ""
+def arguments_extensions_to_str_list(extensions_dict):
+    res = []
 
     for extension, conclusions in extensions_dict.items():
+        str = ""
         str += set_to_str(extension)
         str += " {} ".format(TURNSTILE)
         str += set_to_str(conclusions)
-        str += "<br/>"
+        res.append(str)
 
-    return str
+    return res
 
 def rules_to_str(rules):
     str = ""
@@ -183,7 +223,7 @@ def rule_to_str(rule):
     return str
 
 
-def generate_json(deductions, attacks):
+def generate_json(deductions, attacks, highlighted_sentences):
     output = {"nodes": list(), "links": list()}
 
     support_sets = []
@@ -191,8 +231,10 @@ def generate_json(deductions, attacks):
         if ded.premise not in support_sets:
             support_sets.append(ded.premise)
 
+            group = 2 if frozenset(ded.premise).issubset(highlighted_sentences) else 1
+
             node = {"name": set_to_str(ded.premise),
-                    "group": 1}
+                    "group": group}
             output["nodes"].append(node)
 
     # maps (attacker, attackee) to attack type

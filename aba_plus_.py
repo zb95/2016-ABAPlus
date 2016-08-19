@@ -474,9 +474,17 @@ class ABA_Plus:
                 res.add(atk)
         return res
 
-    def generate_attack(self, attacker, attackee):
-        all_deductions = self.generate_all_deductions(attacker)
+    def generate_extra_attacks(self, attacks, new_support):
+        new_ded = Deduction(new_support, new_support)
+        new_attacks = set()
 
+        for atk in attacks:
+            if atk.attacker.premise.issubset(new_support) and atk.attacker.premise != new_support:
+                new_attacks.add(Attack(new_ded, atk.attackee, atk.type))
+            if atk.attackee.premise.issubset(new_support) and atk.attackee.premise != new_support:
+                new_attacks.add(Attack(atk.attacker, new_ded, atk.type))
+
+        return new_attacks
 
 class Rule:
     def __init__(self, antecedent=set(), consequent=None):
