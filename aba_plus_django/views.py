@@ -44,6 +44,8 @@ class IndexView(generic.ListView):
             return HttpResponseRedirect(reverse('aba_plus_django:results'))
         '''
         request.session['compute'] = True
+        print("SEEETTTTT TOOOOOOO TRUEEEEEEEEEEEEE")
+        print(request.session['compute'])
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
 class ResultsView(generic.ListView):
@@ -57,7 +59,8 @@ class ResultsView(generic.ListView):
         context = super(generic.ListView, self).get_context_data(**kwargs)
 
         if self.request.session['compute']:
-            self.request.session['compute'] = False
+            print("CCCCCCOMMMMMMMMMMMMMMPPPPUUUUUUTTTTTTTTTIIIIIIIIINNNNNGGGGGGGG")
+
             if self.request.session['auto_WCP']:
                 abap = generate_aba_plus_framework(self.request.session['input'])
                 context['rules_added'] = rules_to_str(abap.check_or_auto_WCP(auto_WCP = True))
@@ -99,6 +102,7 @@ class ResultsView(generic.ListView):
             print(json_input)
 
             print(self.request.session.session_key)
+            self.request.session['compute'] = False
             results[self.request.session.session_key] = (abap, deductions, attacks, stable_l, stable_list, stable_ext)
         else:
             print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
