@@ -100,7 +100,7 @@ class ResultsView(generic.ListView):
 
             # maps indices to extensions
             extension_map = {}
-            i = 0
+            i = 1
             for ext, conclusions in stable_ext.items():
                 extension_map[i] = (ext, conclusions, STABLE)
                 i += 1
@@ -121,6 +121,7 @@ class ResultsView(generic.ListView):
             context['json_input'] = generate_json(deductions, attacks, None)
 
             self.request.session['to_compute'] = False
+            self.request.session['highlight_index'] = None
 
             print(self.request.session.session_key)
             results[self.request.session.session_key] = {'abap': abap, 'deductions': deductions, 'attacks': attacks,
@@ -142,7 +143,7 @@ class ResultsView(generic.ListView):
             context['ideal'] = arguments_extensions_to_str_list(result['ideal_ext'])
 
             highlighted_ext = None
-            if 'highlight_index' in self.request.session:
+            if  self.request.session['highlight_index']:
                 print("MEEEEEEEEEEEEEEEEEOW")
                 print(self.request.session['highlight_index'])
                 extension_map = result['extension_map']
