@@ -158,20 +158,78 @@ svg.append("svg:defs").selectAll("marker")
 
 drawGraph(graph);
 </script>
+
 <br/>
     {% autoescape off %}
 
-    Select extension to highlight: <br/>
+    {% if highlighted_extension %}
+        {{ highlighted_extension_type }} extension highlighted: {{highlighted_extension}} <br/><br/>
+    {% endif %}
+
+    Select stable extension to highlight: <br/>
     <form method="post">
         {% csrf_token %}
       <select name="select_extension">
-          {% for ext in stable_list %}
-            <option value="{{ext.0}}">stable: {{ext.1|f_set}}</option>
+          {% for key, ext in extensions.items %}
+            {% if ext.2 == 1 %}
+                <option value="{{key}}">{{ext.0|f_set}}</option>
+            {% endif %}
           {% endfor %}
       </select>
-      <br><br>
-      <input type="submit" name="highlight">
-    </form>
+      <input type="submit" name="highlight" value="Highlight">
+    </form> <br/>
+
+    Select grounded extension to highlight: <br/>
+    <form method="post">
+        {% csrf_token %}
+      <select name="select_extension">
+          {% for key, ext in extensions.items %}
+            {% if ext.2 == 2 %}
+                <option value="{{key}}"> {{ext.0|f_set}}</option>
+            {% endif %}
+          {% endfor %}
+      </select>
+      <input type="submit" name="highlight" value="Highlight">
+    </form> <br/>
+
+    Select complete extension to highlight: <br/>
+    <form method="post">
+        {% csrf_token %}
+      <select name="select_extension">
+          {% for key, ext in extensions.items %}
+            {% if ext.2 == 3 %}
+                <option value="{{key}}"> {{ext.0|f_set}}</option>
+            {% endif %}
+          {% endfor %}
+      </select>
+      <input type="submit" name="highlight" value="Highlight">
+    </form> <br/>
+
+    Select preferred extension to highlight: <br/>
+    <form method="post">
+        {% csrf_token %}
+      <select name="select_extension">
+          {% for key, ext in extensions.items %}
+            {% if ext.2 == 4 %}
+                <option value="{{key}}"> {{ext.0|f_set}}</option>
+            {% endif %}
+          {% endfor %}
+      </select>
+      <input type="submit" name="highlight" value="Highlight">
+    </form> <br/>
+
+    Select ideal extension to highlight: <br/>
+    <form method="post">
+        {% csrf_token %}
+      <select name="select_extension">
+          {% for key, ext in extensions.items %}
+            {% if ext.2 == 5 %}
+                <option value="{{key}}"> {{ext.0|f_set}}</option>
+            {% endif %}
+          {% endfor %}
+      </select>
+      <input type="submit" name="highlight" value="Highlight">
+    </form> <br/>
 
     Input: <br/>
     {{ input }}  <br/> <br/>

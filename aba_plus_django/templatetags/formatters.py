@@ -13,5 +13,5 @@ def format_deduction(deduction):
     return str
 
 @register.filter(name='f_set')
-def format_deduction(set_to_format):
+def format_set(set_to_format):
     return set_to_str(set_to_format)

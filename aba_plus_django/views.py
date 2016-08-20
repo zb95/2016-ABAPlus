@@ -13,7 +13,17 @@ SOLVER_INPUT = "input_for_solver.lp"
 TURNSTILE = "&#x22a2;"
 ARROW = "&rarr;"
 OVERLINE = "<span style=\"text-decoration: overline\">{}</span>"
+
 BOTH_ATTACKS = 3
+
+STABLE = 1
+GROUNDED = 2
+COMPLETE = 3
+PREFERRED = 4
+IDEAL = 5
+
+extension_type_names = {STABLE: "stable", GROUNDED: "grounded",
+                      COMPLETE: "complete", PREFERRED: "preferred", IDEAL: "ideal"}
 
 #maps session keys to calculation results
 results = {}
@@ -43,9 +53,7 @@ class IndexView(generic.ListView):
         else:
             return HttpResponseRedirect(reverse('aba_plus_django:results'))
         '''
-        request.session['compute'] = True
-        print("SEEETTTTT TOOOOOOO TRUEEEEEEEEEEEEE")
-        print(request.session['compute'])
+        request.session['to_compute'] = True
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
 class ResultsView(generic.ListView):
@@ -58,8 +66,8 @@ class ResultsView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(generic.ListView, self).get_context_data(**kwargs)
 
-        if self.request.session['compute']:
-            print("CCCCCCOMMMMMMMMMMMMMMPPPPUUUUUUTTTTTTTTTIIIIIIIIINNNNNGGGGGGGG")
+        if self.request.session['to_compute']:
+            print("=====================COMPUTING RESULTS=====================")
 
             if self.request.session['auto_WCP']:
                 abap = generate_aba_plus_framework(self.request.session['input'])
@@ -79,70 +87,91 @@ class ResultsView(generic.ListView):
             asp.generate_input_file_for_clingo(SOLVER_INPUT)
 
             stable_ext = asp.calculate_stable_arguments_extensions(SOLVER_INPUT)
+            grounded_ext = asp.calculate_grounded_arguments_extensions(SOLVER_INPUT)
+            complete_ext = asp.calculate_complete_arguments_extensions(SOLVER_INPUT)
+            preferred_ext = asp.calculate_preferred_arguments_extensions(SOLVER_INPUT)
+            ideal_ext = asp.calculate_ideal_arguments_extensions(SOLVER_INPUT)
+
             context['stable'] = arguments_extensions_to_str_list(stable_ext)
-            stable_l = list(stable_ext.keys())
-            stable_list = []
+            context['grounded'] = arguments_extensions_to_str_list(grounded_ext)
+            context['complete'] = arguments_extensions_to_str_list(complete_ext)
+            context['preferred'] = arguments_extensions_to_str_list(preferred_ext)
+            context['ideal'] = arguments_extensions_to_str_list(ideal_ext)
 
+            # maps indices to extensions
+            extension_map = {}
             i = 0
-            for s in stable_l:
-                stable_list.append((i,s))
+            for ext, conclusions in stable_ext.items():
+                extension_map[i] = (ext, conclusions, STABLE)
                 i += 1
-            context['stable_list'] = stable_list
+            for ext, conclusions in grounded_ext.items():
+                extension_map[i] = (ext, conclusions, GROUNDED)
+                i += 1
+            for ext, conclusions in complete_ext.items():
+                extension_map[i] = (ext, conclusions, COMPLETE)
+                i += 1
+            for ext, conclusions in preferred_ext.items():
+                extension_map[i] = (ext, conclusions, PREFERRED)
+                i += 1
+            for ext, conclusions in ideal_ext.items():
+                extension_map[i] = (ext, conclusions, IDEAL)
+                i += 1
+            context['extensions'] = extension_map
 
+            context['json_input'] = generate_json(deductions, attacks, None)
 
-
-
-            context['grounded'] = arguments_extensions_to_str_list(asp.calculate_grounded_arguments_extensions(SOLVER_INPUT))
-            context['complete'] = arguments_extensions_to_str_list(asp.calculate_complete_arguments_extensions(SOLVER_INPUT))
-            context['preferred'] = arguments_extensions_to_str_list(asp.calculate_preferred_arguments_extensions(SOLVER_INPUT))
-            context['ideal'] = arguments_extensions_to_str_list(asp.calculate_ideal_arguments_extensions(SOLVER_INPUT))
-
-            json_input = generate_json(deductions, attacks, None)
-            context['json_input'] = json_input
-            print(json_input)
+            self.request.session['to_compute'] = False
 
             print(self.request.session.session_key)
-            self.request.session['compute'] = False
-            results[self.request.session.session_key] = (abap, deductions, attacks, stable_l, stable_list, stable_ext)
+            results[self.request.session.session_key] = {'abap': abap, 'deductions': deductions, 'attacks': attacks,
+                                                         'extension_map': extension_map, 'stable_ext': stable_ext,
+                                                         'grounded_ext': grounded_ext, 'complete_ext': complete_ext,
+                                                         'ideal_ext': ideal_ext, 'preferred_ext': preferred_ext}
+
         else:
-            print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+            print("=================RELOADING RESULT=====================")
             result = results[self.request.session.session_key]
-            set_attacks = convert_to_attacks_between_sets(result[2])
+
+            set_attacks = convert_to_attacks_between_sets(result['attacks'])
             context['attacks'] = [set_atk_to_str(atk) for atk in set_attacks]
 
-            context['stable'] = arguments_extensions_to_str_list(result[5])
+            context['stable'] = arguments_extensions_to_str_list(result['stable_ext'])
+            context['grounded'] = arguments_extensions_to_str_list(result['grounded_ext'])
+            context['complete'] = arguments_extensions_to_str_list(result['complete_ext'])
+            context['preferred'] = arguments_extensions_to_str_list(result['preferred_ext'])
+            context['ideal'] = arguments_extensions_to_str_list(result['ideal_ext'])
 
             highlighted_ext = None
-            print("MEEEEEEEEEEEEP")
-            print(self.request.session['highlight'])
             if 'highlight' in self.request.session:
-                print("RRRRRRRFFFFFFFFFFFFFFFFFFF")
-                to_highlight = self.request.session['highlight']
-                print(to_highlight)
-                stable_l = result[3]
-                highlighted_ext = stable_l[to_highlight]
+                extension_map = result['extension_map']
+                to_highlight = self.request.session['highlight_idx']
+                highlighted_ext = extension_map[to_highlight][0]
 
+                context['highlighted_extension'] = argument_to_str(extension_map[to_highlight][0],
+                                                                   extension_map[to_highlight][1])
+                extension_type = extension_map[to_highlight][2]
+                context['highlighted_extension_type'] = extension_type_names[extension_type]
 
-            json_input = generate_json(result[1], result[2], highlighted_ext)
+            context['json_input'] = generate_json(result['deductions'], result['attacks'], highlighted_ext)
 
-            context['stable_list'] = result[4]
-
-            context['json_input'] = json_input
+            context['extensions'] = result['extension_map']
 
         return context
 
     def post(self, request, **kwargs):
-        if self.request.session['compute']:
-            print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
+        if self.request.session['to_compute']:
+            print("================COMPUTE======================")
+
         if 'auto_WCP' in self.request.POST:
-            print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
+            print("=========AUTO WCP=============")
             self.request.session['auto_WCP'] = True
+
         elif 'select_extension' in self.request.POST:
-            print("SEEEEEEEEEEEELLLLLLLLEEEEEEEECCCCCCCCCCTTTTTTTTTTT")
+            print("===============EXTENSION SELECTED==================")
             selection = request.POST['select_extension']
-            print(selection)
-            self.request.session['highlight'] = int(selection)
-            print(self.request.session['highlight'])
+            self.request.session['highlight_idx'] = int(selection)
+            print(self.request.session['highlight_idx'])
+
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
 
@@ -200,13 +229,16 @@ def arguments_extensions_to_str_list(extensions_dict):
     res = []
 
     for extension, conclusions in extensions_dict.items():
-        str = ""
-        str += set_to_str(extension)
-        str += " {} ".format(TURNSTILE)
-        str += set_to_str(conclusions)
-        res.append(str)
+        res.append(argument_to_str(extension, conclusions))
 
     return res
+
+def argument_to_str(premise, conclusion):
+    str = ""
+    str += set_to_str(premise)
+    str += " {} ".format(TURNSTILE)
+    str += set_to_str(conclusion)
+    return str
 
 def rules_to_str(rules):
     str = ""
