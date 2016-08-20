@@ -142,9 +142,11 @@ class ResultsView(generic.ListView):
             context['ideal'] = arguments_extensions_to_str_list(result['ideal_ext'])
 
             highlighted_ext = None
-            if 'highlight' in self.request.session:
+            if 'highlight_index' in self.request.session:
+                print("MEEEEEEEEEEEEEEEEEOW")
+                print(self.request.session['highlight_index'])
                 extension_map = result['extension_map']
-                to_highlight = self.request.session['highlight_idx']
+                to_highlight = self.request.session['highlight_index']
                 highlighted_ext = extension_map[to_highlight][0]
 
                 context['highlighted_extension'] = argument_to_str(extension_map[to_highlight][0],
@@ -159,6 +161,7 @@ class ResultsView(generic.ListView):
         return context
 
     def post(self, request, **kwargs):
+        print("=============POST====================")
         if self.request.session['to_compute']:
             print("================COMPUTE======================")
 
@@ -169,8 +172,8 @@ class ResultsView(generic.ListView):
         elif 'select_extension' in self.request.POST:
             print("===============EXTENSION SELECTED==================")
             selection = request.POST['select_extension']
-            self.request.session['highlight_idx'] = int(selection)
-            print(self.request.session['highlight_idx'])
+            self.request.session['highlight_index'] = int(selection)
+            print(self.request.session['highlight_index'])
 
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
