@@ -122,6 +122,7 @@ class ResultsView(generic.ListView):
 
             self.request.session['to_compute'] = False
             self.request.session['highlight_index'] = None
+            self.request.session['compare_index'] = None
 
             print(self.request.session.session_key)
             results[self.request.session.session_key] = {'abap': abap, 'deductions': deductions, 'attacks': attacks,
@@ -144,7 +145,7 @@ class ResultsView(generic.ListView):
 
             highlighted_ext = None
             if  self.request.session['highlight_index']:
-                print("MEEEEEEEEEEEEEEEEEOW")
+                print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
                 print(self.request.session['highlight_index'])
                 extension_map = result['extension_map']
                 to_highlight = self.request.session['highlight_index']
@@ -156,6 +157,21 @@ class ResultsView(generic.ListView):
                 context['highlighted_extension_type'] = extension_type_names[extension_type]
 
             context['json_input'] = generate_json(result['deductions'], result['attacks'], highlighted_ext)
+
+            if self.request.session['compare_index']:
+                print("CCCCCCCCCCCCCCCCCCCCCCCCCC")
+                print(self.request.session['compare_index'])
+                extension_map = result['extension_map']
+                to_highlight = self.request.session['compare_index']
+                highlighted_ext2 = extension_map[to_highlight][0]
+
+                context['compared_extension'] = argument_to_str(extension_map[to_highlight][0],
+                                                                   extension_map[to_highlight][1])
+                extension_type = extension_map[to_highlight][2]
+                context['compared_extension_type'] = extension_type_names[extension_type]
+
+                context['render_graph2'] = True
+                context['json_input2'] = generate_json(result['deductions'], result['attacks'], highlighted_ext2)
 
             context['extensions'] = result['extension_map']
 
@@ -175,6 +191,12 @@ class ResultsView(generic.ListView):
             selection = request.POST['select_extension']
             self.request.session['highlight_index'] = int(selection)
             print(self.request.session['highlight_index'])
+
+        elif 'compare_extension' in self.request.POST:
+            print("===============EXTENSION COMPARED==================")
+            selection = request.POST['compare_extension']
+            self.request.session['compare_index'] = int(selection)
+            print(self.request.session['compare_index'])
 
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 

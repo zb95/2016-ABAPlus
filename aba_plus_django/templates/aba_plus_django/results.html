@@ -26,20 +26,56 @@
 <script src="{% static 'assets/js/d3.js' %}"></script>
 <script>
     {% autoescape off %}
-    var json_string = '{{json_input}}';
+        var json_string = '{{json_input}}';
+        var render_graph2 = '{{render_graph2}}';
+        if (render_graph2) {
+            var json_string2 = '{{json_input2}}';
+        }
     {% endautoescape %}
 </script>
 <script>
 
-var width = 800,
+var width = 700,
 height = 600;
 
 var color = d3.scale.category20();
 
 var radius = d3.scale.sqrt()
     .range([0, 6]);
+</script>
 
-var svg = d3.select("body").append("svg")
+<table>
+    {% autoescape off %}
+    <tr>
+        <td id="cell1">
+        </td>
+
+        {% if render_graph2 %}
+        <td id="cell2">
+        </td>
+        {% endif %}
+    </tr>
+
+    <tr>
+            <td>
+                {% if highlighted_extension %}
+                    {{ highlighted_extension_type }} extension highlighted: {{highlighted_extension}} <br/><br/>
+                {% endif %}
+            </td>
+
+            {% if render_graph2 %}
+            <td>
+                {% if compared_extension %}
+                    {{ compared_extension_type }} extension highlighted: {{compared_extension}} <br/><br/>
+                {% endif %}
+            </td>
+            {% endif %}
+    </tr>
+    {% endautoescape %}
+</table>
+
+<script>
+var svg = d3.select("#cell1").append("svg")
     .attr("style", "outline: thin solid gray;")
     .attr("width", width)
     .attr("height", height);
@@ -52,7 +88,7 @@ var force = d3.layout.force()
 
 var graph = JSON.parse(json_string);
 
-var drawGraph = function(graph) {
+var drawGraph = function(graph, svg, force) {
   force
       .nodes(graph.nodes)
       .links(graph.links)
@@ -156,80 +192,168 @@ svg.append("svg:defs").selectAll("marker")
   }
 };
 
-drawGraph(graph);
+drawGraph(graph, svg, force);
+
+if (render_graph2) {
+    var graph2 = JSON.parse(json_string2);
+
+    var svg2 = d3.select("#cell2").append("svg")
+    .attr("style", "outline: thin solid gray;")
+    .attr("width", width)
+    .attr("height", height);
+
+    var force2 = d3.layout.force()
+    .gravity(0.15)
+    .distance(150)
+    .charge(-5000)
+    .size([width, height]);
+
+    drawGraph(graph2, svg2, force2);
+}
 </script>
+
+
 
 <br/>
     {% autoescape off %}
 
-    {% if highlighted_extension %}
-        {{ highlighted_extension_type }} extension highlighted: {{highlighted_extension}} <br/><br/>
-    {% endif %}
+    <table>
+        <tr>
+            <td>
+                Select stable extension to highlight: <br/>
+                <form method="post">
+                    {% csrf_token %}
+                  <select name="select_extension">
+                      {% for key, ext in extensions.items %}
+                        {% if ext.2 == 1 %}
+                            <option value="{{key}}">{{ext.0|f_set}}</option>
+                        {% endif %}
+                      {% endfor %}
+                  </select>
+                  <input type="submit" name="highlight" value="Highlight">
+                </form> <br/>
 
-    Select stable extension to highlight: <br/>
-    <form method="post">
-        {% csrf_token %}
-      <select name="select_extension">
-          {% for key, ext in extensions.items %}
-            {% if ext.2 == 1 %}
-                <option value="{{key}}">{{ext.0|f_set}}</option>
-            {% endif %}
-          {% endfor %}
-      </select>
-      <input type="submit" name="highlight" value="Highlight">
-    </form> <br/>
+                Select grounded extension to highlight: <br/>
+                <form method="post">
+                    {% csrf_token %}
+                  <select name="select_extension">
+                      {% for key, ext in extensions.items %}
+                        {% if ext.2 == 2 %}
+                            <option value="{{key}}"> {{ext.0|f_set}}</option>
+                        {% endif %}
+                      {% endfor %}
+                  </select>
+                  <input type="submit" name="highlight" value="Highlight">
+                </form> <br/>
 
-    Select grounded extension to highlight: <br/>
-    <form method="post">
-        {% csrf_token %}
-      <select name="select_extension">
-          {% for key, ext in extensions.items %}
-            {% if ext.2 == 2 %}
-                <option value="{{key}}"> {{ext.0|f_set}}</option>
-            {% endif %}
-          {% endfor %}
-      </select>
-      <input type="submit" name="highlight" value="Highlight">
-    </form> <br/>
+                Select complete extension to highlight: <br/>
+                <form method="post">
+                    {% csrf_token %}
+                  <select name="select_extension">
+                      {% for key, ext in extensions.items %}
+                        {% if ext.2 == 3 %}
+                            <option value="{{key}}"> {{ext.0|f_set}}</option>
+                        {% endif %}
+                      {% endfor %}
+                  </select>
+                  <input type="submit" name="highlight" value="Highlight">
+                </form> <br/>
 
-    Select complete extension to highlight: <br/>
-    <form method="post">
-        {% csrf_token %}
-      <select name="select_extension">
-          {% for key, ext in extensions.items %}
-            {% if ext.2 == 3 %}
-                <option value="{{key}}"> {{ext.0|f_set}}</option>
-            {% endif %}
-          {% endfor %}
-      </select>
-      <input type="submit" name="highlight" value="Highlight">
-    </form> <br/>
+                Select preferred extension to highlight: <br/>
+                <form method="post">
+                    {% csrf_token %}
+                  <select name="select_extension">
+                      {% for key, ext in extensions.items %}
+                        {% if ext.2 == 4 %}
+                            <option value="{{key}}"> {{ext.0|f_set}}</option>
+                        {% endif %}
+                      {% endfor %}
+                  </select>
+                  <input type="submit" name="highlight" value="Highlight">
+                </form> <br/>
 
-    Select preferred extension to highlight: <br/>
-    <form method="post">
-        {% csrf_token %}
-      <select name="select_extension">
-          {% for key, ext in extensions.items %}
-            {% if ext.2 == 4 %}
-                <option value="{{key}}"> {{ext.0|f_set}}</option>
-            {% endif %}
-          {% endfor %}
-      </select>
-      <input type="submit" name="highlight" value="Highlight">
-    </form> <br/>
+                Select ideal extension to highlight: <br/>
+                <form method="post">
+                    {% csrf_token %}
+                  <select name="select_extension">
+                      {% for key, ext in extensions.items %}
+                        {% if ext.2 == 5 %}
+                            <option value="{{key}}"> {{ext.0|f_set}}</option>
+                        {% endif %}
+                      {% endfor %}
+                  </select>
+                  <input type="submit" name="highlight" value="Highlight">
+                </form> <br/>
+            </td>
 
-    Select ideal extension to highlight: <br/>
-    <form method="post">
-        {% csrf_token %}
-      <select name="select_extension">
-          {% for key, ext in extensions.items %}
-            {% if ext.2 == 5 %}
-                <option value="{{key}}"> {{ext.0|f_set}}</option>
-            {% endif %}
-          {% endfor %}
-      </select>
-      <input type="submit" name="highlight" value="Highlight">
-    </form> <br/>
+            <td>
+                Select stable extension to compare: <br/>
+                <form method="post">
+                    {% csrf_token %}
+                  <select name="compare_extension">
+                      {% for key, ext in extensions.items %}
+                        {% if ext.2 == 1 %}
+                            <option value="{{key}}">{{ext.0|f_set}}</option>
+                        {% endif %}
+                      {% endfor %}
+                  </select>
+                  <input type="submit" name="compare" value="Compare">
+                </form> <br/>
+
+                Select grounded extension to compare: <br/>
+                <form method="post">
+                    {% csrf_token %}
+                  <select name="compare_extension">
+                      {% for key, ext in extensions.items %}
+                        {% if ext.2 == 2 %}
+                            <option value="{{key}}"> {{ext.0|f_set}}</option>
+                        {% endif %}
+                      {% endfor %}
+                  </select>
+                  <input type="submit" name="compare" value="Compare">
+                </form> <br/>
+
+                Select complete extension to compare: <br/>
+                <form method="post">
+                    {% csrf_token %}
+                  <select name="compare_extension">
+                      {% for key, ext in extensions.items %}
+                        {% if ext.2 == 3 %}
+                            <option value="{{key}}"> {{ext.0|f_set}}</option>
+                        {% endif %}
+                      {% endfor %}
+                  </select>
+                  <input type="submit" name="compare" value="Compare">
+                </form> <br/>
+
+                Select preferred extension to compare: <br/>
+                <form method="post">
+                    {% csrf_token %}
+                  <select name="compare_extension">
+                      {% for key, ext in extensions.items %}
+                        {% if ext.2 == 4 %}
+                            <option value="{{key}}"> {{ext.0|f_set}}</option>
+                        {% endif %}
+                      {% endfor %}
+                  </select>
+                  <input type="submit" name="compare" value="Compare">
+                </form> <br/>
+
+                Select ideal extension to compare: <br/>
+                <form method="post">
+                    {% csrf_token %}
+                  <select name="compare_extension">
+                      {% for key, ext in extensions.items %}
+                        {% if ext.2 == 5 %}
+                            <option value="{{key}}"> {{ext.0|f_set}}</option>
+                        {% endif %}
+                      {% endfor %}
+                  </select>
+                  <input type="submit" name="compare" value="Compare">
+                </form> <br/>
+            </td>
+        </tr>
+    </table>
 
     Input: <br/>
     {{ input }}  <br/> <br/>
