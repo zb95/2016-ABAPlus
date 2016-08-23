@@ -83,7 +83,7 @@ var svg = d3.select("#cell1").append("svg")
 var force = d3.layout.force()
     .gravity(0.15)
     .distance(150)
-    .charge(-5000)
+    .charge(-4000)
     .size([width, height]);
 
 var graph = JSON.parse(json_string);
@@ -179,7 +179,7 @@ svg.append("svg:defs").selectAll("marker")
 
   node.append("circle")
       .attr("r", 12)
-      .attr("fill", function(d) { return d.group == 1 ? d3.rgb(204,0,105) : d3.rgb(255, 204, 102)});
+      .attr("fill", function(d) { return d.group == 1 ? d3.rgb(100,100,100) : d3.rgb(230, 0, 115)});
 
   node.append("text")
       .attr("dx", 12)
