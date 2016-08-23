@@ -140,8 +140,8 @@ svg.append("svg:defs").selectAll("marker")
   .enter().append("svg:marker")    // This section adds in the arrows
     .attr("id", String)
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 18)
-    .attr("refY", -8)
+    .attr("refX", 40)
+    .attr("refY", 30)
     .attr("markerWidth", 5.5)
     .attr("markerHeight", 5.5)
     .attr("orient", 110)
@@ -165,6 +165,12 @@ svg.append("svg:defs").selectAll("marker")
           .attr("marker-end", function(d) {
               if ( d.source == d.target ){
                   return "url(#end2)"
+              } else {
+                  return ""
+              }})
+          .attr("marker-mid", function(d) {
+              if ( d.source == d.target ){
+                  return ""
               } else {
                   return "url(#end)"
               }})
