@@ -119,17 +119,32 @@ var drawGraph = function(graph, svg, force) {
       .start();
 
 
-      // build the arrow.
+      // build the arrow for normal links
 svg.append("svg:defs").selectAll("marker")
     .data(["end"])      // Different link/path types can be defined here
   .enter().append("svg:marker")    // This section adds in the arrows
     .attr("id", String)
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 15)
-    .attr("refY", -1.5)
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
+    .attr("refX", 19)
+    .attr("refY", -0.5)
+    .attr("markerWidth", 5.5)
+    .attr("markerHeight", 5.5)
     .attr("orient", "auto")
+        .style("fill", d3.rgb(150,150,150))
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+    //build the arrow for self links
+svg.append("svg:defs").selectAll("marker")
+    .data(["end2"])      // Different link/path types can be defined here
+  .enter().append("svg:marker")    // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 18)
+    .attr("refY", -8)
+    .attr("markerWidth", 5.5)
+    .attr("markerHeight", 5.5)
+    .attr("orient", 110)
         .style("fill", d3.rgb(150,150,150))
   .append("svg:path")
     .attr("d", "M0,-5L10,0L0,5");
@@ -147,7 +162,12 @@ svg.append("svg:defs").selectAll("marker")
                   case 3: //both attacks
                       return "1,0"
               } })
-          .attr("marker-end", "url(#end)")
+          .attr("marker-end", function(d) {
+              if ( d.source == d.target ){
+                  return "url(#end2)"
+              } else {
+                  return "url(#end)"
+              }})
           .style("stroke", d3.rgb(150,150,150))
     .style("stroke-width", 2);
 
@@ -158,7 +178,7 @@ svg.append("svg:defs").selectAll("marker")
       .call(node_drag);
 
   node.append("circle")
-      .attr("r", 8)
+      .attr("r", 12)
       .attr("fill", function(d) { return d.group == 1 ? d3.rgb(204,0,105) : d3.rgb(255, 204, 102)});
 
   node.append("text")
