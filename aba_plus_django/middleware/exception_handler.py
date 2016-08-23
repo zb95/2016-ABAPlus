@@ -10,4 +10,6 @@ class ExceptionMiddleware(object):
             return HttpResponse(exception.message)
         elif isinstance(exception, WCPViolationException):
             return render(request, template_name='../templates/aba_plus_django/auto_wcp.html')
+        elif isinstance(exception, KeyError):
+            return HttpResponse("Session has ended.")
         return None

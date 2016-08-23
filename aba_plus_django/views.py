@@ -45,6 +45,8 @@ class IndexView(generic.ListView):
                 str += chunk.decode("utf-8")
             request.session['input'] = str
 
+        request.session['auto_WCP'] = False
+
         '''
         if "auto_WCP" in request.POST:
             request.session['auto_WCP'] = True
@@ -187,6 +189,7 @@ class ResultsView(generic.ListView):
             request.session['input'] = request.POST['input_text']
 
             request.session['to_compute'] = True
+            request.session['auto_WCP'] = False
 
         elif "submit_file" in request.POST:
             file = request.FILES['myfile']
@@ -196,6 +199,7 @@ class ResultsView(generic.ListView):
             request.session['input'] = str
 
             request.session['to_compute'] = True
+            request.session['auto_WCP'] = False
 
         print("=============POST====================")
         if self.request.session['to_compute']:
