@@ -45,12 +45,12 @@ class IndexView(generic.ListView):
                 str += chunk.decode("utf-8")
             request.session['input'] = str
 
+        '''
         if "auto_WCP" in request.POST:
             request.session['auto_WCP'] = True
         else:
             request.session['auto_WCP'] = False
 
-        '''
         try:
             request.session['abap'] = generate_aba_plus_framework(self.request.session['input'])
         except CyclicPreferenceException:
@@ -183,6 +183,20 @@ class ResultsView(generic.ListView):
         return context
 
     def post(self, request, **kwargs):
+        if "submit_text" in request.POST:
+            request.session['input'] = request.POST['input_text']
+
+            request.session['to_compute'] = True
+
+        elif "submit_file" in request.POST:
+            file = request.FILES['myfile']
+            str = ""
+            for chunk in file.chunks():
+                str += chunk.decode("utf-8")
+            request.session['input'] = str
+
+            request.session['to_compute'] = True
+
         print("=============POST====================")
         if self.request.session['to_compute']:
             print("================COMPUTE======================")

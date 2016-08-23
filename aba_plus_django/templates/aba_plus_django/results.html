@@ -413,7 +413,18 @@ if (render_graph2) {
     {% for ext in ideal %} {{ext}} <br/> {% endfor %}
     <br/>
 
+    <textarea name="input_text" form="form1" style="height:500px; width:100%; border:solid 1px gray; resize:none; overflow-y: scroll;" ></textarea>
+    <br/><br/>
+    <form method="post" id="form1">
+        {% csrf_token %}
+        <input type="submit" name="submit_text" value="Load" />
+    </form>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="myfile" />
+        <input type="submit" name="submit_file" value="Upload" />
+    </form>
     {% endautoescape %}
-</body>
 </body>
 </html>
