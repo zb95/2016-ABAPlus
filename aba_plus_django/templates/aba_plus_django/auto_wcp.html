@@ -5,10 +5,10 @@
     <title>WCP not satisfied</title>
 </head>
 <body>
-    The Weak Contraposition is not satisifed. <br/>
+    Weak Contraposition (WCP) is not satisfied for the ABA&#8314; framework given the input <br/>
     <form method="post" action="{% url 'aba_plus_django:results' %}">
         {% csrf_token %}
-        <input type="submit" name="auto_WCP" value="automatically partially satisfy WCP" />
+        <input type="submit" name="auto_WCP" value="automatically satisfy WCP" />
     </form>
 </body>
 </html>
