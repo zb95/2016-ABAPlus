@@ -43,9 +43,40 @@ var color = d3.scale.category20();
 var radius = d3.scale.sqrt()
     .range([0, 6]);
 </script>
+{% autoescape off %}
+Input ABA&#8314; framework
+<table width="100%">
+    <tr>
+        <td>
+            <textarea name="input_text" form="form1" style="height:500px; width:100%; border:solid 1px gray; resize:none; overflow-y: scroll;" >{{input_text}} </textarea>
+            <br/>
+            <form method="post" id="form1">
+                {% csrf_token %}
+                <input type="submit" name="submit_text" value="Load" />
+            </form>
+        </td>
+        <td style="vertical-align:top; padding-left:20px">
+            {% if rules_added %}
+                Rules added to satisfy WCP: <br/>
+                {{ rules_added}}
+            {% else %}
+                {{ WCP }}
+            {% endif %} <br/> <br/>
+        </td>
+    </tr>
+</table> <br/>
 
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="myfile" />
+    <input type="submit" name="submit_file" value="Upload" />
+</form>
+
+<br/>
+
+Visualisation of the input ABA&#8314; framework as an assumption graph
 <table>
-    {% autoescape off %}
+
     <tr>
         <td id="cell1">
         </td>
@@ -73,6 +104,7 @@ var radius = d3.scale.sqrt()
     </tr>
     {% endautoescape %}
 </table>
+
 
 <script>
 var svg = d3.select("#cell1").append("svg")
@@ -265,6 +297,27 @@ if (render_graph2) {
 
 <br/>
     {% autoescape off %}
+    Extensions (in the form Set of Accepted Assumptions &#x22a2; Set of derivable sentences ) <br/><br/>
+
+    Stable extensions: <br/>
+    {% for ext in stable %} {{ext}} <br/> {% endfor %}
+    <br/>
+
+    Grounded extensions: <br/>
+    {% for ext in grounded %} {{ext}} <br/> {% endfor %}
+    <br/>
+
+    Complete extensions: <br/>
+    {% for ext in complete %} {{ext}} <br/> {% endfor %}
+    <br/>
+
+    Preferred extensions: <br/>
+    {% for ext in preferred %} {{ext}} <br/> {% endfor %}
+    <br/>
+
+    ideal extensions: <br/>
+    {% for ext in ideal %} {{ext}} <br/> {% endfor %}
+    <br/>
 
     <table>
         <tr>
@@ -404,53 +457,7 @@ if (render_graph2) {
         </tr>
     </table>
 
-    Input: <br/>
-    {{ input }}  <br/> <br/>
 
-    {% if rules_added %}
-        Rules added: <br/>
-        {{ rules_added}}
-    {% else %}
-        {{ WCP }}
-    {% endif %} <br/> <br/>
-
-    Attacks: <br/>
-    {% for atk in attacks %}
-        {{ atk }} <br/>
-    {% endfor %} <br/> <br/>
-
-    Stable extensions: <br/>
-    {% for ext in stable %} {{ext}} <br/> {% endfor %}
-    <br/>
-
-    Grounded extensions: <br/>
-    {% for ext in grounded %} {{ext}} <br/> {% endfor %}
-    <br/>
-
-    Complete extensions: <br/>
-    {% for ext in complete %} {{ext}} <br/> {% endfor %}
-    <br/>
-
-    Preferred extensions: <br/>
-    {% for ext in preferred %} {{ext}} <br/> {% endfor %}
-    <br/>
-
-    ideal extensions: <br/>
-    {% for ext in ideal %} {{ext}} <br/> {% endfor %}
-    <br/>
-
-    <textarea name="input_text" form="form1" style="height:500px; width:100%; border:solid 1px gray; resize:none; overflow-y: scroll;" ></textarea>
-    <br/><br/>
-    <form method="post" id="form1">
-        {% csrf_token %}
-        <input type="submit" name="submit_text" value="Load" />
-    </form>
-
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="file" name="myfile" />
-        <input type="submit" name="submit_file" value="Upload" />
-    </form>
     {% endautoescape %}
 </body>
 </html>

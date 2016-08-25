@@ -76,11 +76,14 @@ class ResultsView(generic.ListView):
         if self.request.session['to_compute']:
             print("=====================COMPUTING RESULTS=====================")
 
+            rules_added = None
+            res = generate_aba_plus_framework(self.request.session['input'])
+            abap = res[0]
+            contr_map = res[1]
             if self.request.session['auto_WCP']:
-                abap = generate_aba_plus_framework(self.request.session['input'])
-                context['rules_added'] = rules_to_str(abap.check_or_auto_WCP(auto_WCP = True))
+                rules_added = rules_to_str(abap.check_or_auto_WCP(auto_WCP = True))
+                context['rules_added'] = rules_added
             else:
-                abap = generate_aba_plus_framework(self.request.session['input'])
                 abap.check_or_auto_WCP()
 
             res = abap.generate_arguments_and_attacks_for_contraries()
@@ -127,6 +130,8 @@ class ResultsView(generic.ListView):
 
             context['json_input'] = generate_json(deductions, attacks, None)
 
+            context['input_text'] = self.request.session['input']
+
             self.request.session['to_compute'] = False
             self.request.session['highlight_index'] = None
             self.request.session['compare_index'] = None
@@ -135,11 +140,14 @@ class ResultsView(generic.ListView):
             results[self.request.session.session_key] = {'abap': abap, 'deductions': deductions, 'attacks': attacks,
                                                          'extension_map': extension_map, 'stable_ext': stable_ext,
                                                          'grounded_ext': grounded_ext, 'complete_ext': complete_ext,
-                                                         'ideal_ext': ideal_ext, 'preferred_ext': preferred_ext}
+                                                         'ideal_ext': ideal_ext, 'preferred_ext': preferred_ext,
+                                                         'rules_added': rules_added}
 
         else:
             print("=================RELOADING RESULT=====================")
             result = results[self.request.session.session_key]
+
+            context['rules_added'] = result['rules_added']
 
             set_attacks = convert_to_attacks_between_sets(result['attacks'])
             context['attacks'] = [set_atk_to_str(atk) for atk in set_attacks]
@@ -181,6 +189,7 @@ class ResultsView(generic.ListView):
                 context['json_input2'] = generate_json(result['deductions'], result['attacks'], highlighted_ext2)
 
             context['extensions'] = result['extension_map']
+            context['input_text'] = self.request.session['input']
 
         return context
 

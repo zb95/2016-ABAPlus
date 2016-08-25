@@ -50,7 +50,7 @@ def generate_aba_plus_framework(input_string):
     pref_declarations = [decl for decl in declarations if (LT_PREDICATE in decl) or (LE_PREDICATE in decl)]
     preferences = generate_preferences(pref_declarations)
 
-    return ABA_Plus(assumptions, preferences, rules)
+    return (ABA_Plus(assumptions, preferences, rules), contr_map)
 
 def generate_assumptions(assump_decls):
     assumptions = set()
@@ -65,7 +65,7 @@ def generate_assumptions(assump_decls):
 
     return assumptions
 
-# TODO: check that only assumptions have contraries
+
 def generate_contraries_map(contr_decls):
     #maps symbols to contraries
     map = {}
@@ -113,10 +113,25 @@ def generate_contraries_map(contr_decls):
                 print("4")
                 map[contrary] = sentence
 
-
-
     return (map, aux_rules)
+'''
 
+# TODO: check that only assumptions have contraries
+# TODO: throw exception when multiple contraries for the same assumption detected and vice versa
+def generate_contraries_map(contr_decls):
+    # maps symbols to contraries
+    map = {}
+
+    for decl in contr_decls:
+        cleaned_decl = decl.replace(" ", "")
+        match = re.match(CONTR_REGEX, cleaned_decl)
+        if match:
+            sentence = match.group(1)
+            contrary = match.group(2)
+            map[contrary] = Sentence(sentence, True)
+
+    return (map, set())
+'''
 def generate_rules(rule_decls, map, aux_rules):
     rules = aux_rules
 
