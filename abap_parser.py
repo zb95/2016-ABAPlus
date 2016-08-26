@@ -65,7 +65,7 @@ def generate_assumptions(assump_decls):
 
     return assumptions
 
-
+'''
 def generate_contraries_map(contr_decls):
     #maps symbols to contraries
     map = {}
@@ -128,10 +128,10 @@ def generate_contraries_map(contr_decls):
         if match:
             sentence = match.group(1)
             contrary = match.group(2)
-            map[contrary] = Sentence(sentence, True)
+            map[contrary] = sentence
 
     return (map, set())
-'''
+
 def generate_rules(rule_decls, map, aux_rules):
     rules = aux_rules
 

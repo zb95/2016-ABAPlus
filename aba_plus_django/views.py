@@ -79,9 +79,10 @@ class ResultsView(generic.ListView):
             rules_added = None
             res = generate_aba_plus_framework(self.request.session['input'])
             abap = res[0]
-            contr_map = res[1]
+            #reverse dictionary to map sentences to contraries
+            contr_map = dict((v, k) for k, v in res[1].items())
             if self.request.session['auto_WCP']:
-                rules_added = rules_to_str(abap.check_or_auto_WCP(auto_WCP = True))
+                rules_added = rules_to_str(abap.check_or_auto_WCP(auto_WCP = True), contr_map)
                 context['rules_added'] = rules_added
             else:
                 abap.check_or_auto_WCP()
@@ -102,11 +103,11 @@ class ResultsView(generic.ListView):
             preferred_ext = asp.calculate_preferred_arguments_extensions(SOLVER_INPUT)
             ideal_ext = asp.calculate_ideal_arguments_extensions(SOLVER_INPUT)
 
-            context['stable'] = arguments_extensions_to_str_list(stable_ext)
-            context['grounded'] = arguments_extensions_to_str_list(grounded_ext)
-            context['complete'] = arguments_extensions_to_str_list(complete_ext)
-            context['preferred'] = arguments_extensions_to_str_list(preferred_ext)
-            context['ideal'] = arguments_extensions_to_str_list(ideal_ext)
+            context['stable'] = arguments_extensions_to_str_list(stable_ext, contr_map)
+            context['grounded'] = arguments_extensions_to_str_list(grounded_ext, contr_map)
+            context['complete'] = arguments_extensions_to_str_list(complete_ext, contr_map)
+            context['preferred'] = arguments_extensions_to_str_list(preferred_ext, contr_map)
+            context['ideal'] = arguments_extensions_to_str_list(ideal_ext, contr_map)
 
             # maps indices to extensions
             extension_map = {}
@@ -138,7 +139,8 @@ class ResultsView(generic.ListView):
 
             print(self.request.session.session_key)
             results[self.request.session.session_key] = {'abap': abap, 'deductions': deductions, 'attacks': attacks,
-                                                         'extension_map': extension_map, 'stable_ext': stable_ext,
+                                                         'contr_map': contr_map, 'extension_map': extension_map,
+                                                         'stable_ext': stable_ext,
                                                          'grounded_ext': grounded_ext, 'complete_ext': complete_ext,
                                                          'ideal_ext': ideal_ext, 'preferred_ext': preferred_ext,
                                                          'rules_added': rules_added}
@@ -152,11 +154,13 @@ class ResultsView(generic.ListView):
             set_attacks = convert_to_attacks_between_sets(result['attacks'])
             context['attacks'] = [set_atk_to_str(atk) for atk in set_attacks]
 
-            context['stable'] = arguments_extensions_to_str_list(result['stable_ext'])
-            context['grounded'] = arguments_extensions_to_str_list(result['grounded_ext'])
-            context['complete'] = arguments_extensions_to_str_list(result['complete_ext'])
-            context['preferred'] = arguments_extensions_to_str_list(result['preferred_ext'])
-            context['ideal'] = arguments_extensions_to_str_list(result['ideal_ext'])
+            contr_map = result['contr_map']
+
+            context['stable'] = arguments_extensions_to_str_list(result['stable_ext'], contr_map)
+            context['grounded'] = arguments_extensions_to_str_list(result['grounded_ext'], contr_map)
+            context['complete'] = arguments_extensions_to_str_list(result['complete_ext'], contr_map)
+            context['preferred'] = arguments_extensions_to_str_list(result['preferred_ext'], contr_map)
+            context['ideal'] = arguments_extensions_to_str_list(result['ideal_ext'], contr_map)
 
             highlighted_ext = None
             if  self.request.session['highlight_index']:
@@ -167,7 +171,7 @@ class ResultsView(generic.ListView):
                 highlighted_ext = extension_map[to_highlight][0]
 
                 context['highlighted_extension'] = argument_to_str(extension_map[to_highlight][0],
-                                                                   extension_map[to_highlight][1])
+                                                                   extension_map[to_highlight][1], contr_map)
                 extension_type = extension_map[to_highlight][2]
                 context['highlighted_extension_type'] = extension_type_names[extension_type]
 
@@ -181,7 +185,7 @@ class ResultsView(generic.ListView):
                 highlighted_ext2 = extension_map[to_highlight][0]
 
                 context['compared_extension'] = argument_to_str(extension_map[to_highlight][0],
-                                                                   extension_map[to_highlight][1])
+                                                                   extension_map[to_highlight][1], contr_map)
                 extension_type = extension_map[to_highlight][2]
                 context['compared_extension_type'] = extension_type_names[extension_type]
 
@@ -234,36 +238,38 @@ class ResultsView(generic.ListView):
 
 
 
-def sets_to_str(sets):
+def sets_to_str(sets, contr_map={}):
     str = ""
 
     it = iter(sets)
     first_set = next(it, None)
     if first_set is not None:
-        str += set_to_str(first_set)
+        str += set_to_str(first_set, contr_map)
     for set in it:
         str += ", "
-        str += set_to_str(set)
+        str += set_to_str(set, contr_map)
 
     return str
 
-def set_to_str(set):
+def set_to_str(set, contr_map={}):
     str = "{"
 
     it = iter(set)
     first_sentence = next(it, None)
     if first_sentence is not None:
-        str += sentence_to_str(first_sentence)
+        str += sentence_to_str(first_sentence, contr_map)
     for sentence in it:
         str += ", "
-        str += sentence_to_str(sentence)
+        str += sentence_to_str(sentence, contr_map)
 
     str += "}"
 
     return str
 
-def sentence_to_str(sentence):
+def sentence_to_str(sentence, contr_map={}):
     if sentence.is_contrary:
+        if sentence.symbol in contr_map:
+            return contr_map[sentence.symbol]
         return OVERLINE.format(sentence.symbol)
     else:
         return sentence.symbol
@@ -283,35 +289,35 @@ def set_atk_to_str(atk):
 
     return str
 
-def arguments_extensions_to_str_list(extensions_dict):
+def arguments_extensions_to_str_list(extensions_dict, contr_map):
     res = []
 
     for extension, conclusions in extensions_dict.items():
-        res.append(argument_to_str(extension, conclusions))
+        res.append(argument_to_str(extension, conclusions, contr_map))
 
     return res
 
-def argument_to_str(premise, conclusion):
+def argument_to_str(premise, conclusion, contr_map):
     str = ""
     str += set_to_str(premise)
     str += " {} ".format(TURNSTILE)
-    str += set_to_str(conclusion)
+    str += set_to_str(conclusion, contr_map)
     return str
 
-def rules_to_str(rules):
+def rules_to_str(rules, contr_map):
     str = ""
 
     for rule in rules:
-        str += rule_to_str(rule)
+        str += rule_to_str(rule, contr_map)
 
     return str
 
-def rule_to_str(rule):
+def rule_to_str(rule, contr_map):
     str = ""
 
     str += set_to_str(rule.antecedent)
     str += " {} ".format(ARROW)
-    str += sentence_to_str(rule.consequent)
+    str += sentence_to_str(rule.consequent, contr_map)
     str += "<br/>"
 
     return str

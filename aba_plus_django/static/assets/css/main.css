@@ -49,6 +49,7 @@
 	}
 
 /* Box Model */
+	.ignore-css{all:unset;}
 
 	*, *:before, *:after {
 		-moz-box-sizing: border-box;
@@ -2391,7 +2392,7 @@
 		-webkit-overflow-scrolling: touch;
 		overflow-x: auto;
 	}
-
+/*
 	table {
 		margin: 0 0 2em 0;
 		width: 100%;
@@ -2450,7 +2451,7 @@
 
 			table.alt tfoot {
 				border-top: 0;
-			}
+			}*/
 
 /* Button */
 
