@@ -25,6 +25,10 @@ IDEAL = 5
 extension_type_names = {STABLE: "stable", GROUNDED: "grounded",
                       COMPLETE: "complete", PREFERRED: "preferred", IDEAL: "ideal"}
 
+NOT_HIGHLIGHTED1 = 1
+NOT_HIGHLIGHTED2 = 2
+HIGHLIGHTED = 3
+
 #maps session keys to calculation results
 results = {}
 
@@ -331,8 +335,15 @@ def generate_json(deductions, attacks, highlighted_sentences):
         if ded.premise not in support_sets:
             support_sets.append(ded.premise)
 
+            '''
             group = 2 if not (highlighted_sentences is None) \
                          and frozenset(ded.premise).issubset(highlighted_sentences) else 1
+             '''
+
+            if not(highlighted_sentences is None):
+                group = HIGHLIGHTED if frozenset(ded.premise).issubset(highlighted_sentences) else NOT_HIGHLIGHTED2
+            else:
+                group = NOT_HIGHLIGHTED1
 
             node = {"name": set_to_str(ded.premise),
                     "group": group}

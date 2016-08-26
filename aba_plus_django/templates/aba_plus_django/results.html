@@ -120,6 +120,15 @@ var force = d3.layout.force()
 
 var graph = JSON.parse(json_string);
 
+var gray_normal = d3.rgb(170,170,170);
+var gray_reverse = d3.rgb(190,190,190);
+var gray_both = d3.rgb(150,150,150);
+
+var gray = d3.rgb(100,100,100);
+var green = d3.rgb(102, 255, 153)
+var red = d3.rgb(255, 102, 102);
+
+
 var drawGraph = function(graph, svg, force) {
   var node_drag = d3.behavior.drag()
         .on("dragstart", dragstart)
@@ -150,25 +159,52 @@ var drawGraph = function(graph, svg, force) {
       .on("tick", tick)
       .start();
 
-
       // build the arrow for normal links
 svg.append("svg:defs").selectAll("marker")
-    .data(["end"])      // Different link/path types can be defined here
+    .data(["end_normal"])      // Different link/path types can be defined here
   .enter().append("svg:marker")    // This section adds in the arrows
     .attr("id", String)
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 0)
+    .attr("refX", 20)
     .attr("refY", -0.5)
     .attr("markerWidth", 5.5)
     .attr("markerHeight", 5.5)
     .attr("orient", "auto")
-        .style("fill", d3.rgb(150,150,150))
+        .style("fill", gray_normal)
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+svg.append("svg:defs").selectAll("marker")
+    .data(["end_reverse"])      // Different link/path types can be defined here
+  .enter().append("svg:marker")    // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 20)
+    .attr("refY", -0.5)
+    .attr("markerWidth", 5.5)
+    .attr("markerHeight", 5.5)
+    .attr("orient", "auto")
+        .style("fill", gray_reverse)
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+svg.append("svg:defs").selectAll("marker")
+    .data(["end_both"])      // Different link/path types can be defined here
+  .enter().append("svg:marker")    // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 20)
+    .attr("refY", -0.5)
+    .attr("markerWidth", 5.5)
+    .attr("markerHeight", 5.5)
+    .attr("orient", "auto")
+        .style("fill", gray_both)
   .append("svg:path")
     .attr("d", "M0,-5L10,0L0,5");
 
     //build the arrow for self links
 svg.append("svg:defs").selectAll("marker")
-    .data(["end2"])      // Different link/path types can be defined here
+    .data(["end2_normal"])      // Different link/path types can be defined here
   .enter().append("svg:marker")    // This section adds in the arrows
     .attr("id", String)
     .attr("viewBox", "0 -5 10 10")
@@ -177,7 +213,35 @@ svg.append("svg:defs").selectAll("marker")
     .attr("markerWidth", 5.5)
     .attr("markerHeight", 5.5)
     .attr("orient", 260)
-        .style("fill", d3.rgb(150,150,150))
+        .style("fill", gray_normal)
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+svg.append("svg:defs").selectAll("marker")
+    .data(["end2_reverse"])      // Different link/path types can be defined here
+  .enter().append("svg:marker")    // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", -24)
+    .attr("refY", -45)
+    .attr("markerWidth", 5.5)
+    .attr("markerHeight", 5.5)
+    .attr("orient", 260)
+        .style("fill", gray_reverse)
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+svg.append("svg:defs").selectAll("marker")
+    .data(["end2_both"])      // Different link/path types can be defined here
+  .enter().append("svg:marker")    // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", -24)
+    .attr("refY", -45)
+    .attr("markerWidth", 5.5)
+    .attr("markerHeight", 5.5)
+    .attr("orient", 260)
+        .style("fill", gray_both)
   .append("svg:path")
     .attr("d", "M0,-5L10,0L0,5");
 
@@ -192,21 +256,39 @@ svg.append("svg:defs").selectAll("marker")
                   case 2: //reverse attack
                       return "2,2";
                   case 3: //both attacks
-                      return "1,0"
+                      return "1,0";
               } })
           .attr("marker-end", function(d) {
               if ( d.source == d.target ){
-                  return "url(#end2)"
+                  switch (d.value) {
+                  case 1: //normal attack
+                      return "url(#end2_normal)";
+                  case 2: //reverse attack
+                      return "url(#end2_reverse)";
+                  case 3: //both attacks
+                      return "url(#end2_both)";
+              }
               } else {
-                  return ""
-              }})
-          .attr("marker-mid", function(d) {
-              if ( d.source == d.target ){
-                  return ""
-              } else {
-                  return "url(#end)"
-              }})
-          .style("stroke", d3.rgb(150,150,150))
+                  switch (d.value) {
+                  case 1: //normal attack
+                      return "url(#end_normal)";
+                  case 2: //reverse attack
+                      return "url(#end_reverse)";
+                  case 3: //both attacks
+                      return "url(#end_both)";
+
+              }}})
+          .style("stroke", function(d) {
+              switch (d.value) {
+                  case 1: //normal attack
+                      return gray_normal;
+                  case 2: //reverse attack
+                      return gray_reverse;
+                  case 3: //both attacks
+                      return gray_both;
+              }
+
+          })
     .style("stroke-width", 2);
 
   var node = svg.selectAll(".node")
@@ -217,7 +299,15 @@ svg.append("svg:defs").selectAll("marker")
 
   node.append("circle")
       .attr("r", 12)
-      .attr("fill", function(d) { return d.group == 1 ? d3.rgb(100,100,100) : d3.rgb(230, 0, 115)});
+      .attr("fill", function(d) {
+            switch (d.group) {
+                  case 1:
+                      return gray;
+                  case 2:
+                      return red;
+                  case 3:
+                      return green;
+              }});
 
   node.append("text")
       .attr("dx", 12)
