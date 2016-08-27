@@ -25,6 +25,8 @@ IDEAL = 5
 extension_type_names = {STABLE: "stable", GROUNDED: "grounded",
                       COMPLETE: "complete", PREFERRED: "preferred", IDEAL: "ideal"}
 
+attack_type_names = {NORMAL_ATK: "normal attack", REVERSE_ATK: "reverse attack", BOTH_ATTACKS: "both attacks"}
+
 NOT_HIGHLIGHTED1 = 1
 NOT_HIGHLIGHTED2 = 2
 HIGHLIGHTED = 3
