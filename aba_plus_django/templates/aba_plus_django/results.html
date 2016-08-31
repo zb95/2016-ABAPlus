@@ -410,35 +410,18 @@ if (render_graph2) {
     
     <table>
         <tr>
-            <td>
-    Stable extensions: <br/>
-    {% for ext in stable %} {{ext}} <br/> {% endfor %}
-    <br/>
-            </td>
-            
-            <td>
-    Grounded extensions: <br/>
-    {% for ext in grounded %} {{ext}} <br/> {% endfor %}
-    <br/>
-            </td>
-
-            <td>
-    Complete extensions: <br/>
-    {% for ext in complete %} {{ext}} <br/> {% endfor %}
-    <br/>
-            </td>
-    
-            <td>
-    Preferred extensions: <br/>
-    {% for ext in preferred %} {{ext}} <br/> {% endfor %}
-    <br/>
-            </td>
-
-            <td>
-    Ideal extensions: <br/>
-    {% for ext in ideal %} {{ext}} <br/> {% endfor %}
-    <br/>
-            </td>
+            <th>Stable extensions:</th>
+            <th>Grounded extensions:</th>
+            <th>Complete extensions:</th>
+            <th>Preferred extensions:</th>
+            <th>Ideal extensions:</th>
+        </tr>
+        <tr>
+            <td>{% for ext in stable %} {{ext}} <br/> {% endfor %}</td>
+            <td>{% for ext in grounded %} {{ext}} <br/> {% endfor %}</td>
+            <td>{% for ext in complete %} {{ext}} <br/> {% endfor %}</td>
+            <td>{% for ext in preferred %} {{ext}} <br/> {% endfor %}</td>
+            <td>{% for ext in ideal %} {{ext}} <br/> {% endfor %}</td>
         </tr>
     </table>
 
