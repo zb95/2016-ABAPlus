@@ -51,7 +51,7 @@ var color = d3.scale.category20();
 var radius = d3.scale.sqrt()
     .range([0, 6]);
 
-attack_type_names = {1: "dashed: normal attack", 2: "dotted: reverse attack", 3: "solid: both attacks"}
+attack_type_names = {1: "dashed arrow: normal attack", 2: "dotted arrow: reverse attack", 3: "solid arrow: both normal and reverse attacks"}
 </script>
 {% autoescape off %}
 Input ABA&#8314; framework
@@ -407,26 +407,40 @@ if (render_graph2) {
 <br/>
     {% autoescape off %}
     Extensions (in the form Set of Accepted Assumptions &#x22a2; Set of derivable sentences ) <br/><br/>
-
+    
+    <table>
+        <tr>
+            <td>
     Stable extensions: <br/>
     {% for ext in stable %} {{ext}} <br/> {% endfor %}
     <br/>
-
+            </td>
+            
+            <td>
     Grounded extensions: <br/>
     {% for ext in grounded %} {{ext}} <br/> {% endfor %}
     <br/>
+            </td>
 
+            <td>
     Complete extensions: <br/>
     {% for ext in complete %} {{ext}} <br/> {% endfor %}
     <br/>
-
+            </td>
+    
+            <td>
     Preferred extensions: <br/>
     {% for ext in preferred %} {{ext}} <br/> {% endfor %}
     <br/>
+            </td>
 
-    ideal extensions: <br/>
+            <td>
+    Ideal extensions: <br/>
     {% for ext in ideal %} {{ext}} <br/> {% endfor %}
     <br/>
+            </td>
+        </tr>
+    </table>
 
     <table>
         <tr>
