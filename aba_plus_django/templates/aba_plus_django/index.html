@@ -92,7 +92,9 @@
 
 							Or input an ABA&#8314; framework in the box below and <b>LOAD</b>:
 
-							<textarea name="input_text" form="form1" placeholder="myAsm(a)." style="height:500px; width:100%; border:solid 1px gray; overflow-y: scroll;" ></textarea>
+							<textarea name="input_text" form="form1" 
+							placeholder="myAsm(a). &#10;myAsm(b). &#10; contrary(a, a^c). &#10;contrary(b, s). &#10;myRule(s, [a]). &#10;myPrefLE(b, a)." 
+							style="height:500px; width:100%; border:solid 1px gray; overflow-y: scroll;" ></textarea>
 							    <br/><br/>
 							<form method="post" id="form1">
 								{% csrf_token %}
