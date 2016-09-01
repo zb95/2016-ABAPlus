@@ -52,22 +52,35 @@
 						<div class="inner">
 							<header>
 								<h1>Assumption-Based Argumentation with Preferences. </h1>
-								<p>This website (www-abaplus.doc.ic.ac.uk) carries the interface of a system that implements the computational argumentation formalism ABA&#8314;
-									<a href="https://www.dropbox.com/s/p6cndchc39yzdda/2016%20Cyras%2C%20Toni%20-%20ABA%2B.%20Assumption-Based%20Argumentation%20with%20Preferences.pdf?dl=0 ">
-									(K. &#x10c;yras, F. Toni &#8211; ABA&#8314;: Assumption-Based Argumentation with Preferences. 
-									</a> 
+								<p>
+								    This website (www-abaplus.doc.ic.ac.uk) 
+								    carries the interface of a system that implements the computational argumentation formalism ABA&#8314;
+									    <a href="https://www.dropbox.com/s/p6cndchc39yzdda/2016%20Cyras%2C%20Toni%20-%20ABA%2B.%20Assumption-Based%20Argumentation%20with%20Preferences.pdf?dl=0 ">
+									    (K. &#x10c;yras, F. Toni &#8211; ABA&#8314;: Assumption-Based Argumentation with Preferences</a>,  
 									<em>The 15th International Conference on Principles of Knowledge Representation and Reasoning</em> (KR 2016)).
 									ABA&#8314; is a novel approach to handling preferences in structured argumentation.
-									It is built upon the well established structured argumentation formalism, Assumption-Based Argumentation (ABA), and extends it with a binary preference relation over assumptions.
+									It is built upon the well established structured argumentation formalism, Assumption-Based Argumentation (ABA), 
+									and extends it with a binary preference relation over assumptions.
 									The preferences are incorporated directly into the attack relation and induce a mechanism to reverse attacks.
 								<br/><br/>
-									On this website, the users can specify the individual components of an ABA&#8314; framework (i.e. rules, assumptions with their contraries, and preferences among assumptions). 
-									The system then visualizes the ABA&#8314; framework, computes extensions (under various semantics) and their conclusions, at the same time allowing for a comparison between extensions. 
-								br/><br/>
+									On this website, the users can specify the individual components of an ABA&#8314; framework 
+									(i.e. rules, assumptions with their contraries, and preferences among assumptions). 
+									The system then visualizes the ABA&#8314; framework, computes extensions (under various semantics) and their conclusions, 
+									at the same time allowing for a comparison between extensions. 
+								</p>
+								<p>
+								    An ABA&#8314; framework is specified as follows: 
+							    	<ul>
+										  <li>each rule <b>h <- b<sub>1</sub></b>,…,<b>b<sub>n</sub></b> is defined via <b>myRule(h</b>, <b>[b<sub>1</sub></b>,…,<b>b<sub>n</sub>]).</b> ;</li>
+										  <li>each assumption <b>a</b> is defined via <b>myAsm(a).</b> ; </li>
+										  <li>for an assumption <b>a</b>, its contrary, say <b>x</b>, is defined via <b>contrary(a</b>, <b>x).</b> ; </li>
+										  <li>a strict (respectively, non-strict) preference <b>b < a</b> (respectively <b>b &le; a</b>) of
+											  assumption <b>a</b> over assumption <b>b</b> is defined via <b>myPrefLT(b</b>, <b> a).</b> (respectively, <b>myPrefLE(b</b>, <b> a).</b>).</li>
+									</ul>
 								</p>
 							</header>
 
-							Either choose file and <b>UPLOAD</b> an ABA&#8314; framework <br/><br/>
+							Either choose file (with extension .pl) contaning the specification of an ABA&#8314; framework and <b>UPLOAD</b> <br/><br/>;
 
 							<form method="post" enctype="multipart/form-data">
 								{% csrf_token %}
@@ -77,14 +90,6 @@
 
 							Or input an ABA&#8314; framework in the box below and <b>LOAD</b>:
 
-										<ul>
-										  <li>each rule <b>h <- b<sub>1</sub></b>,…,<b>b<sub>n</sub></b> is defined via <b>myRule(h</b>, <b>[b<sub>1</sub></b>,…,<b>b<sub>n</sub>]).</b> ;</li>
-										  <li>each assumption <b>a</b> is defined via <b>myAsm(a).</b> ; </li>
-										  <li>for an assumption <b>a</b>, its contrary, say <b>x</b>, is defined via <b>contrary(a</b>, <b>x).</b> ; </li>
-										  <li>a strict (respectively, non-strict) preference <b>b < a</b> (respectively <b>b &le; a</b>) of
-											  assumption <b>a</b> over assumption <b>b</b> is defined via <b>myPrefLT(b</b>, <b> a).</b> (respectively, <b>myPrefLE(b</b>, <b> a).</b>).</li>
-										</ul>
-
 							<textarea name="input_text" form="form1" style="height:500px; width:100%; border:solid 1px gray; resize:none; overflow-y: scroll;" ></textarea>
 							    <br/><br/>
 							<form method="post" id="form1">
@@ -92,15 +97,16 @@
 								<input type="submit" name="submit_text" value="Load" />
 							</form>
                             	<br/><br/>
-                                <p>
+                            	
+                            <p>
                                 For more information about ABA&#8314; and/or to report any issues with/bugs of the system please contact
-									<a href="http://www.doc.ic.ac.uk/~kc2813/"> Kristijonas &#x10c;yras (k.cyras13@ic.ac.uk) </a>
-								or
-									<a href="http://www.doc.ic.ac.uk/~ft/"> Francesca Toni (ft@ic.ac.uk) </a>. 
+									<a href="http://www.doc.ic.ac.uk/~kc2813/"> Kristijonas &#x10c;yras (k.cyras13@ic.ac.uk)</a> 
+								or 
+									<a href="http://www.doc.ic.ac.uk/~ft/"> Francesca Toni (ft@ic.ac.uk)</a>. 
 								The implementation has been carried out by Ziyi Bao (ziyi.bao14@ic.ac.uk), 
 								under the Undergraduate Research Opportunities Programme (UROP, http://www.imperial.ac.uk/urop), 
 								supervised by K. &#x10c;yras and F. Toni.
-								</p>
+							</p>
 
 						</div>
 					</div>
