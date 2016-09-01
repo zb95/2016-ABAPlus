@@ -67,15 +67,17 @@
 									(i.e. rules, assumptions with their contraries, and preferences among assumptions). 
 									The system then visualizes the ABA&#8314; framework, computes extensions (under various semantics) and their conclusions, 
 									at the same time allowing for a comparison between extensions. 
-								<br/><br/>
-							    	<ul>
-							    	    An ABA&#8314; framework is specified as follows: 
-										  <li>each rule <b>h <- b<sub>1</sub></b>,…,<b>b<sub>n</sub></b> is defined via <b>myRule(h</b>, <b>[b<sub>1</sub></b>,…,<b>b<sub>n</sub>]).</b> ;</li>
-										  <li>each assumption <b>a</b> is defined via <b>myAsm(a).</b> ; </li>
-										  <li>for an assumption <b>a</b>, its contrary, say <b>x</b>, is defined via <b>contrary(a</b>, <b>x).</b> ; </li>
-										  <li>a strict (respectively, non-strict) preference <b>b < a</b> (respectively <b>b &le; a</b>) of
-											  assumption <b>a</b> over assumption <b>b</b> is defined via <b>myPrefLT(b</b>, <b> a).</b> (respectively, <b>myPrefLE(b</b>, <b> a).</b>).</li>
-									</ul>
+
+							    <ul>
+							    An ABA&#8314; framework is specified as follows: 
+							        <li> each rule <b>h <- b<sub>1</sub></b>,…,<b>b<sub>n</sub></b> is defined via 
+									    <b>myRule(h</b>, <b>[b<sub>1</sub></b>,…,<b>b<sub>n</sub>]).</b> ;</li>
+								    <li> each assumption <b>a</b> is defined via <b>myAsm(a).</b> ; </li>
+									<li> for an assumption <b>a</b>, its contrary, say <b>x</b>, is defined via <b>contrary(a</b>, <b>x).</b> ; </li>
+									<li> a strict (respectively, non-strict) preference <b>b < a</b> (respectively <b>b &le; a</b>) 
+								        of assumption <b>a</b> over assumption <b>b</b> is defined via <b>myPrefLT(b</b>, <b> a).</b> 
+										(respectively, <b>myPrefLE(b</b>, <b> a).</b>).</li>
+								</ul>
 								</p>
 							</header>
 
@@ -90,7 +92,7 @@
 
 							Or input an ABA&#8314; framework in the box below and <b>LOAD</b>:
 
-							<textarea name="input_text" form="form1" style="height:500px; width:100%; border:solid 1px gray; resize:none; overflow-y: scroll;" ></textarea>
+							<textarea name="input_text" form="form1" placeholder="myAsm(a)." style="height:500px; width:100%; border:solid 1px gray; overflow-y: scroll;" ></textarea>
 							    <br/><br/>
 							<form method="post" id="form1">
 								{% csrf_token %}
