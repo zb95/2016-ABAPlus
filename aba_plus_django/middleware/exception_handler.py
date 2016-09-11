@@ -8,7 +8,8 @@ class ExceptionMiddleware(object):
         if isinstance(exception, CyclicPreferenceException) or \
            isinstance(exception, NonFlatException) or \
            isinstance(exception, InvalidPreferenceException) or \
-           isinstance(exception, DuplicateSymbolException):
+           isinstance(exception, DuplicateSymbolException) or \
+           isinstance(exception, InvalidContraryDeclarationException):
             return HttpResponse(exception.message)
         elif isinstance(exception, WCPViolationException):
             return render(request, template_name='../templates/aba_plus_django/auto_wcp.html')

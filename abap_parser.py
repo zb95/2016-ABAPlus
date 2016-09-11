@@ -40,7 +40,7 @@ def generate_aba_plus_framework(input_string):
     assumptions = generate_assumptions(assump_declarations)
 
     contr_declarations = [decl for decl in declarations if CONTR_PREDICATE in decl]
-    res = generate_contraries_map(contr_declarations)
+    res = generate_contraries_map(contr_declarations, assumptions)
     contr_map = res[0]
     aux_rules = res[1]
 
@@ -117,12 +117,11 @@ def generate_contraries_map(contr_decls):
 '''
 
 # TODO: check that only assumptions have contraries
-# TODO: throw exception when multiple contraries for the same assumption detected and vice versa
-def generate_contraries_map(contr_decls):
+def generate_contraries_map(contr_decls, assumptions):
     # maps symbols to contraries
     map = {}
-
     symbols_seen = set()
+    assumption_symbols = [asm.symbol for asm in assumptions]
 
     for decl in contr_decls:
         cleaned_decl = decl.replace(" ", "")
@@ -130,6 +129,11 @@ def generate_contraries_map(contr_decls):
         if match:
             sentence = match.group(1)
             contrary = match.group(2)
+
+            if sentence not in assumption_symbols:
+                raise InvalidContraryDeclarationException("Contraries cannot be declared for non-assumptions!")
+            if contrary in assumption_symbols:
+                raise InvalidContraryDeclarationException("The symbol of an assumption cannot be used as a contrary!")
 
             if sentence in symbols_seen:
                 raise DuplicateSymbolException("The contrary of an assumption can only be mapped to a single symbol!")
@@ -141,6 +145,10 @@ def generate_contraries_map(contr_decls):
             symbols_seen.add(contrary)
 
     return (map, set())
+
+class InvalidContraryDeclarationException(Exception):
+    def __init__(self, message):
+        self.message = message
 
 class DuplicateSymbolException(Exception):
     def __init__(self, message):
