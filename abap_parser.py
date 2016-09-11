@@ -122,15 +122,29 @@ def generate_contraries_map(contr_decls):
     # maps symbols to contraries
     map = {}
 
+    symbols_seen = set()
+
     for decl in contr_decls:
         cleaned_decl = decl.replace(" ", "")
         match = re.match(CONTR_REGEX, cleaned_decl)
         if match:
             sentence = match.group(1)
             contrary = match.group(2)
+
+            if sentence in symbols_seen:
+                raise DuplicateSymbolException("The contrary of an assumption can only be mapped to a single symbol!")
+            if contrary in symbols_seen:
+                raise DuplicateSymbolException("A symbol can only be mapped to the contrary of one assumption!")
+
             map[contrary] = sentence
+            symbols_seen.add(sentence)
+            symbols_seen.add(contrary)
 
     return (map, set())
+
+class DuplicateSymbolException(Exception):
+    def __init__(self, message):
+        self.message = message
 
 def generate_rules(rule_decls, map, aux_rules):
     rules = aux_rules
