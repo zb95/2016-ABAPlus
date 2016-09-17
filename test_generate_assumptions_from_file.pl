@@ -9,7 +9,7 @@ myPrefLT(a, b).
 myPrefLE(c, d).
 
 contrary(a, q).
-contrary(b, f).
+contrary(b, v).
 contrary(c, u).
 
 myRule(p, [a,u]).
