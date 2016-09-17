@@ -11,7 +11,6 @@ NORMAL_ATK = 1
 REVERSE_ATK = 2
 
 class ABA_Plus:
-    # TODO: remove redundant 'weaker' preferences
     def __init__(self, assumptions, preferences, rules):
         self.assumptions = assumptions
         self.preferences = preferences
@@ -105,11 +104,14 @@ class ABA_Plus:
                 der_rules.add(rule)
         return der_rules
 
+
     def get_relation(self, assump1, assump2):
+        strongest_relation_found = NO_RELATION
         for pref in self.preferences:
-            if pref.assump1 == assump1 and pref.assump2 == assump2:
-                return pref.relation
-        return NO_RELATION
+            if pref.assump1 == assump1 and pref.assump2 == assump2 and \
+               pref.relation < strongest_relation_found:
+                strongest_relation_found = pref.relation
+        return strongest_relation_found
 
     def is_preferred(self, assump1, assump2):
         return self.get_relation(assump2, assump1) == LESS_THAN
@@ -502,7 +504,6 @@ class Rule:
         return (tuple(sort_sentences(list(self.antecedent))),
                 self.consequent).__hash__()
 
-# TODO: remove default values
 class Sentence:
     def __init__(self, symbol=None, is_contrary=False):
         self.symbol = symbol
