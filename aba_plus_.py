@@ -254,8 +254,8 @@ class ABA_Plus:
 
     def get_minimally_preferred(self, compare_against, assumptions):
         """
-        :param compare_against: Sentence which should have higher preference than the return value
-        :return: the minimally preferred Sentence in assumptions, which has lower preference than compare_against,
+        :param compare_against: assumption which should have higher preference than the return value
+        :return: the minimally preferred assumptions in assumptions, which has lower preference than compare_against,
                  return None if none exists
         """
         filtered = [assump for assump in assumptions if self.is_preferred(compare_against, assump)]
@@ -269,6 +269,10 @@ class ABA_Plus:
 
     #TODO: rename to avoid confusion between supporting sets and 'arguments' in abstract argumentation
     def generate_arguments(self, generate_for):
+        """
+        :param generate_for: a Sentence
+        :return: set of sets of assumptions, where each set contains assumptions deducing generate_for
+        """
         return self._generate_arguments(generate_for, set())
 
     def _generate_arguments(self, generate_for, rules_seen):
@@ -299,6 +303,14 @@ class ABA_Plus:
         return results
 
     def generate_arguments_and_attacks(self, generate_for):
+        """
+        generate arguments supporting generate_for and all attacks between the arguments
+        :param generate_for:
+        :return: tuple (deductions, attacks, all_deductions)
+                 deductions: dictionary that maps sentences to sets of Deductions that deduce them
+                 attacks: set of all attacks generated
+                 all_deductions: set of all Deductions generated
+        """
         deductions = {}
         attacks = set()
         # maps attackees to attackers in normal attacks
@@ -361,33 +373,34 @@ class ABA_Plus:
         return (deductions, attacks, all_deductions)
 
     def generate_arguments_and_attacks_for_contraries(self):
+        """
+        generate arguments supporting generate_for and all attacks between the arguments
+        :return:
+        """
         return self.generate_arguments_and_attacks([asm.contrary() for asm in self.assumptions])
 
     def attack_successful(self, attacker, attackee):
+        """
+        :param attacker: set of Sentences
+        :param attackee: a Sentence
+        :return: True if attacker attacks attackee successfully, false otherwise
+        """
         for atk in attacker:
             if self.is_preferred(attackee, atk):
                 return False
         return True
 
     def attacking_sentences_less_than_attackee(self, attacker, attackee):
+        """
+        :param attacker: set of Sentences
+        :param attackee: a Sentence
+        :return: the set of Sentences in attacker with lower preference than attackee
+        """
         res = set()
         for atk in attacker:
             if self.is_preferred(attackee, atk):
                 res.add(atk)
         return res
-
-    def generate_extra_attacks(self, attacks, new_support):
-        new_ded = Deduction(new_support, new_support)
-        new_attacks = set()
-
-        for atk in attacks:
-            if atk.attacker.premise.issubset(new_support) and atk.attacker.premise != new_support:
-                new_attacks.add(Attack(new_ded, atk.attackee, atk.type))
-            if atk.attackee.premise.issubset(new_support) and atk.attackee.premise != new_support:
-                new_attacks.add(Attack(atk.attacker, new_ded, atk.type))
-
-        return new_attacks
-
 
 class Rule:
     def __init__(self, antecedent=set(), consequent=None):
