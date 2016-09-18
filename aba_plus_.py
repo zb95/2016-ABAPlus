@@ -25,7 +25,16 @@ class ABA_Plus:
         if not self.calc_transitive_closure():
             raise CyclicPreferenceException("Cycle in preferences detected!")
 
+    def __str__(self):
+        return str(self.__dict__)
+
     def check_or_auto_WCP(self, **kwargs):
+        """
+        Check WCP is satisfied
+        If arg auto_WCP is True, automatically satisfy WCP
+        :return: the set of rules added to satisfy WCP if auto_WCP == True, otherwise return None
+
+        """
         auto_WCP = kwargs.get('auto_WCP', False)
 
         if auto_WCP:
@@ -36,6 +45,10 @@ class ABA_Plus:
         return None
 
     def is_flat(self):
+        """
+        Check if ABA+ framework is flat
+        :return: True if framework is flat, False otherwise
+        """
         for rule in self.rules:
             if rule.consequent in self.assumptions:
                 return False
@@ -43,14 +56,22 @@ class ABA_Plus:
         return True
 
     def preferences_only_between_assumptions(self):
+        """
+        Check if preference relations are only between assumptoins
+        :return: True if the above is true, False otherwise
+        """
         for pref in self.preferences:
             if pref.assump1 not in self.assumptions or \
                pref.assump2 not in self.assumptions:
                 return False
         return True
 
-    # returns False if error in preferences, e.g. a < a, True otherwise
     def calc_transitive_closure(self):
+        """
+        Calculate transitive closure of preference relations
+        Add the result of calculation to the framework, if no error occurs
+        :return: True if no cycle in preference relations is detected, False otherwise
+        """
         assump_list = list(self.assumptions)
         m = len(assump_list)
         relation_matrix = np.full((m, m), NO_RELATION)
@@ -75,8 +96,12 @@ class ABA_Plus:
 
         return True
 
-    # in relation_matrix, use 1 for < and 2 for <=
     def _transitive_closure(self, relation_matrix):
+        """
+        Calculate transitive closure given a relation matrix
+        :param relation_matrix: relation matrix, where LESS_THAN represents < and LESS_EQUAL represents <=
+        :return: a relation matrix of the transitive closure
+        """
         n = len(relation_matrix)
         d = np.copy(relation_matrix)
 
@@ -91,13 +116,10 @@ class ABA_Plus:
 
         return d
 
-    def __str__(self):
-        return str(self.__dict__)
-
-    def attacking_rules(self, sentence):
-        return self.deriving_rules(sentence.contrary())
-
     def deriving_rules(self, sentence):
+        """
+        :return: the set of all rules deriving sentence
+        """
         der_rules = set()
         for rule in self.rules:
             if rule.consequent == sentence:
@@ -106,6 +128,9 @@ class ABA_Plus:
 
 
     def get_relation(self, assump1, assump2):
+        """
+        :return: the strongest relation between two assumptions, assump1 and assump2
+        """
         strongest_relation_found = NO_RELATION
         for pref in self.preferences:
             if pref.assump1 == assump1 and pref.assump2 == assump2 and \
@@ -114,16 +139,18 @@ class ABA_Plus:
         return strongest_relation_found
 
     def is_preferred(self, assump1, assump2):
+        """
+        :return: True if the relation assump2 < assump1 exists, False otherwise
+        """
         return self.get_relation(assump2, assump1) == LESS_THAN
 
-    def _WCP_fulfilled(self, contradictor, assumption, antecedent):
-        negated_contr = contradictor.contrary()
-        deduce_from = antecedent.copy()
-        deduce_from.add(assumption)
-        deduce_from.remove(contradictor)
-        return self.deduction_exists(negated_contr, deduce_from)
 
     def deduction_exists(self, to_deduce, deduce_from):
+        """
+        :param to_deduce: a Sentence
+        :param deduce_from: set of Sentences
+        :return: True, if to_deduce can be deduced from deduce_from
+        """
         rules_applied = set()
         deduced = deduce_from.copy()
         new_rule_used = True
@@ -142,6 +169,10 @@ class ABA_Plus:
         return False
 
     def generate_all_deductions(self, deduce_from):
+        """
+        :param deduce_from: set of Sentences
+        :return: set of all Sentences that can be derived from deduce_from
+        """
         rules_applied = set()
         deduced = deduce_from.copy()
         new_rule_used = True
@@ -156,13 +187,12 @@ class ABA_Plus:
 
         return deduced
 
-    def direct_decution_exists(self, to_deduce, deduce_from):
-        for rule in self.rules:
-            if rule.consequent == to_deduce and rule.antecedent.issubset(deduce_from):
-                return True
-        return False
-
     def set_combinations(self, iterable):
+        """
+        Compute all combinations of sets of sets
+        example:
+        set_combinations({{b}},{{e},{f}}) returns {{b,e},{b,f}}
+        """
         return self._set_combinations(iter(iterable))
 
     def _set_combinations(self, iter):
@@ -179,53 +209,11 @@ class ABA_Plus:
             return resulting_combinations
 
         return set()
-    '''
-    def check_WCP(self):
-        for assump in self.assumptions:
-            att_rules = self.attacking_rules(assump)
-            for rule in att_rules:
-                violation_found = False
-
-                for contradictor in rule.antecedent:
-                    result = self.preference_check(assump, contradictor, rule.antecedent, set())
-                    if result == False:
-                        violation_found = True
-                    elif result == CANNOT_BE_DERIVED:
-                        violation_found = False
-                        break
-
-                if violation_found:
-                    return False
-
-        return True
-
-    def preference_check(self, assumption, contradictor, antecedent, rules_seen):
-        if contradictor in self.assumptions and \
-           self.is_preferred(assumption, contradictor) and \
-           not self._WCP_fulfilled(contradictor, assumption, antecedent):
-            return False
-        elif contradictor not in self.assumptions:
-            der_rules = self.deriving_rules(contradictor)
-            if not der_rules:
-                return CANNOT_BE_DERIVED
-            for rule in der_rules:
-                if rule not in rules_seen:
-                    violation_found = False
-                    _rules_seen = rules_seen.copy()
-                    _rules_seen.add(rule)
-                    for ant in rule.antecedent:
-                        result =  self.preference_check(assumption, ant, rule.antecedent, _rules_seen)
-                        if result == False:
-                            violation_found = True
-                        elif result == CANNOT_BE_DERIVED:
-                            violation_found = False
-                            break
-                    if violation_found == True:
-                        return False
-        return True
-    '''
 
     def check_WCP(self):
+        """
+        :return: True if WCP is satisfied for the frameowrk, False otherwise
+        """
         for assump in self.assumptions:
             attacker_sets = self.generate_arguments(assump.contrary())
             for attacker_set in attacker_sets:
@@ -238,6 +226,10 @@ class ABA_Plus:
 
     # returns rules added
     def check_and_partially_satisfy_WCP(self):
+        """
+        Add rules to the framework in order to satisfy WCP
+        :return: set of rules added to the framework
+        """
         rules_added = set()
         for assump in self.assumptions:
             attacker_sets = self.generate_arguments(assump.contrary())
@@ -253,11 +245,22 @@ class ABA_Plus:
                         break
         return rules_added
 
+    def _WCP_fulfilled(self, contradictor, assumption, antecedent):
+        negated_contr = contradictor.contrary()
+        deduce_from = antecedent.copy()
+        deduce_from.add(assumption)
+        deduce_from.remove(contradictor)
+        return self.deduction_exists(negated_contr, deduce_from)
 
     def get_minimally_preferred(self, compare_against, assumptions):
+        """
+        :param compare_against: Sentence which should have higher preference than the return value
+        :return: the minimally preferred Sentence in assumptions, which has lower preference than compare_against,
+                 return None if none exists
+        """
         filtered = [assump for assump in assumptions if self.is_preferred(compare_against, assump)]
         it = iter(filtered)
-        minimal = next(it)
+        minimal = next(it, None)
         for assump in it:
             if self.is_preferred(minimal, assump):
                 minimal = assump
@@ -294,80 +297,6 @@ class ABA_Plus:
                 if not args_lacking:
                     results = results.union(self.set_combinations(supporting_assumptions))
         return results
-    '''
-    def generate_arguments_and_attacks(self, generate_for):
-        deductions = {}
-        attacks = set()
-        # maps attackees to attackers in reverse attacks
-        reverse_atk_map = {}
-
-        # generate trivial deductions for all assumptions:
-        for assumption in self.assumptions:
-            deductions[assumption] = set()
-            deductions[assumption].add(Deduction({assumption}, {assumption}))
-            # print(next(iter(deductions[assumption])))
-
-        # generate supporting assumptions
-        for sentence in generate_for:
-            args = self.generate_arguments(sentence)
-            if args:
-                deductions[sentence] = set()
-
-                for arg in args:
-                    arg_deduction = Deduction(arg, {sentence})
-                    deductions[sentence].add(arg_deduction)
-
-                    if sentence.is_contrary and sentence.contrary() in self.assumptions:
-                        trivial_arg = Deduction({sentence.contrary()}, {sentence.contrary()})
-
-                        if self.attack_successful(arg, sentence.contrary()):
-                            attacks.add(Attack(arg_deduction, trivial_arg, NORMAL_ATK))
-                        else:
-                            attacks.add(Attack(trivial_arg, arg_deduction, REVERSE_ATK))
-
-                            f_arg = frozenset(arg)
-                            if f_arg not in reverse_atk_map:
-                                reverse_atk_map[f_arg] = set()
-                            reverse_atk_map[f_arg].add(sentence.contrary())
-
-        # generate attacks between supporting sets
-        for _, deduction_set in deductions.items():
-            for deduction in deduction_set:
-                for sentence in deduction.premise:
-                    if sentence.contrary() in deductions:
-                        attacking_args = deductions[sentence.contrary()]
-                        for attacking_arg in attacking_args:
-                            if self.attack_successful(attacking_arg.premise, sentence):
-                                attacks.add(Attack(attacking_arg, deduction, NORMAL_ATK))
-                            else:
-                                attacks.add(Attack(deduction, attacking_arg, REVERSE_ATK))
-
-        ''''''
-        for k, v in reverse_atk_map.items():
-            print("Reverse Attackee:")
-            print(format_set(k))
-            for reverse_attacker in v:
-                print("Reverse Attacker")
-                print(format_sentence(reverse_attacker))
-        print()
-        ''''''
-
-        all_deductions = ft.reduce(lambda x, y: x.union(y), deductions.values())
-        for r_attackee, r_attacker_sets in reverse_atk_map.items():
-            attackees = [ded for ded in all_deductions if r_attackee.issubset(ded.premise)]
-            for r_attacker in r_attacker_sets:
-                attackers = [ded for ded in all_deductions if r_attacker in ded.premise]
-                for attackee in attackees:
-                    for attacker in attackers:
-                        attacks.add(Attack(attacker, attackee, REVERSE_ATK))
-
-        ''''''
-        for atk in attacks:
-            print_attack(atk)
-        print()
-        ''''''
-        return (deductions, attacks, all_deductions)
-    '''
 
     def generate_arguments_and_attacks(self, generate_for):
         deductions = {}
@@ -381,7 +310,6 @@ class ABA_Plus:
         for assumption in self.assumptions:
             deductions[assumption] = set()
             deductions[assumption].add(Deduction({assumption}, {assumption}))
-            # print(next(iter(deductions[assumption])))
 
         # generate supporting assumptions
         for sentence in generate_for:
@@ -412,29 +340,6 @@ class ABA_Plus:
                                 reverse_atk_map[f_arg] = set()
                             reverse_atk_map[f_arg].add(sentence.contrary())
 
-        '''
-        # generate attacks between supporting sets
-        for _, deduction_set in deductions.items():
-            for deduction in deduction_set:
-                for sentence in deduction.premise:
-                    if sentence.contrary() in deductions:
-                        attacking_args = deductions[sentence.contrary()]
-                        for attacking_arg in attacking_args:
-                            if self.attack_successful(attacking_arg.premise, sentence):
-                                attacks.add(Attack(attacking_arg, deduction, NORMAL_ATK))
-                            else:
-                                attacks.add(Attack(deduction, attacking_arg, REVERSE_ATK))
-        '''
-
-        '''
-        for k, v in reverse_atk_map.items():
-            print("Reverse Attackee:")
-            print(format_set(k))
-            for reverse_attacker in v:
-                print("Reverse Attacker")
-                print(format_sentence(reverse_attacker))
-        print()
-        '''
         all_deductions = ft.reduce(lambda x, y: x.union(y), deductions.values())
 
         for n_attackee, n_attacker_sets in atk_map.items():
@@ -453,11 +358,6 @@ class ABA_Plus:
                     for attacker in attackers:
                         attacks.add(Attack(attacker, attackee, REVERSE_ATK))
 
-        '''
-        for atk in attacks:
-            print_attack(atk)
-        print()
-        '''
         return (deductions, attacks, all_deductions)
 
     def generate_arguments_and_attacks_for_contraries(self):
@@ -487,6 +387,7 @@ class ABA_Plus:
                 new_attacks.add(Attack(atk.attacker, new_ded, atk.type))
 
         return new_attacks
+
 
 class Rule:
     def __init__(self, antecedent=set(), consequent=None):
