@@ -33,57 +33,11 @@ class ASPARTIX_Interface:
     def __init__(self, aba_plus):
         self.aba_plus = aba_plus
 
-    '''
-    def generate_input_file_for_clingo(self, filename):
-        res = self.aba_plus.generate_arguments_and_attacks_for_contraries()
-        deductions = res[0]
-        self.attacks = res[1]
-        #for atk in self.attacks:
-         #   print_attack(atk)
-          #  print()
-        ''''''
-        for _, v in deductions.items():
-            for d in v:
-                print_deduction(d)
-                print()
-        ''''''
-        #maps arguments to indices, which are used to represent the arguments in the input file
-        self.arguments = []
-        for _, deduction_set in deductions.items():
-            for deduction in deduction_set:
-                self.arguments.append(deduction)
-
-        for i in range(0,len(self.arguments)):
-            print(i)
-            print_deduction(self.arguments[i])
-        f = open(filename, 'w')
-
-        for idx in range(0, len(self.arguments)):
-            f.write("arg({}).\n".format(idx))
-
-        for atk in self.attacks:
-            idx_attacker = self.arguments.index(atk.attacker)
-            idx_attackee = self.arguments.index(atk.attackee)
-            f.write("att({}, {}).\n".format(idx_attacker, idx_attackee))
-
-        f.close()
-        '''
-
-
-
     def generate_input_file_for_clingo(self, filename):
         res = self.aba_plus.generate_arguments_and_attacks_for_contraries()
         deductions = res[2]
         attacks = res[1]
-        #for atk in self.attacks:
-         #   print_attack(atk)
-          #  print()
-        '''
-        for _, v in deductions.items():
-            for d in v:
-                print_deduction(d)
-                print()
-        '''
+
         #maps arguments to indices, which are used to represent the arguments in the input file
         self.arguments = []
         for deduction in deductions:
@@ -94,10 +48,6 @@ class ASPARTIX_Interface:
         for atk in attacks:
             self.attacks.add((frozenset(atk.attacker.premise),
                               frozenset(atk.attackee.premise)))
-
-        for i in range(0,len(self.arguments)):
-            print(i)
-            print(format_set(self.arguments[i]))
 
         f = open(filename, 'w')
 
@@ -130,11 +80,11 @@ class ASPARTIX_Interface:
         return self.calculate_extensions(CLINGO_COMMAND, input_filename, GROUNDED_FILE, CLINGO_ANSWER, CLINGO_REGEX)
 
     def calculate_extensions(self, command, input_filename, encoding_filename, answer_header, regex):
+        #for python 3.5 and later:
         '''res = subprocess.run(command.format(input_filename, encoding_filename),
                              stdout=subprocess.PIPE,
                              universal_newlines=True)
 
-        #print(res.stdout)
         if answer_header not in res.stdout:
             return set()
 
@@ -146,8 +96,6 @@ class ASPARTIX_Interface:
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = res.stdout.read().decode("utf-8")
 
-        print(output)
-
         if answer_header not in output:
             return set()
 
@@ -156,19 +104,11 @@ class ASPARTIX_Interface:
         extension_sets = set()
         answer_sets = results[1:len(results)+1]
         for answer in answer_sets:
-           # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            #print(answer)
             matches = re.findall(regex, answer)
             extension = set()
             for m in matches:
-                #print(m)
                 arg = self.arguments[int(m)]
-                #print(s)
                 extension = extension.union(arg)
-                #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-                #print(extension)
-            #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            #print(frozenset(extension))
             extension_sets.add(frozenset(extension))
 
         return extension_sets
