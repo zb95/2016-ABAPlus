@@ -41,7 +41,7 @@ def generate_aba_plus_framework(input_string):
     rules = generate_rules(rule_declarations, contr_map, aux_rules)
 
     pref_declarations = [decl for decl in declarations if (LT_PREDICATE in decl) or (LE_PREDICATE in decl)]
-    preferences = generate_preferences(pref_declarations)
+    preferences = generate_preferences(pref_declarations, assumptions)
 
     return (ABA_Plus(assumptions, preferences, rules), contr_map)
 
@@ -87,14 +87,6 @@ def generate_contraries_map(contr_decls, assumptions):
 
     return (map, set())
 
-class InvalidContraryDeclarationException(Exception):
-    def __init__(self, message):
-        self.message = message
-
-class DuplicateSymbolException(Exception):
-    def __init__(self, message):
-        self.message = message
-
 def generate_rules(rule_decls, map, aux_rules):
     rules = aux_rules
 
@@ -117,8 +109,9 @@ def generate_rules(rule_decls, map, aux_rules):
     return rules
 
 # TODO: check if sentences are assumptions
-def generate_preferences(pref_decls):
+def generate_preferences(pref_decls, assumptions):
     preferences = set()
+    assumption_symbols = [asm.symbol for asm in assumptions]
 
     for decl in pref_decls:
         cleaned_decl = decl.replace(" ", "")
@@ -133,9 +126,15 @@ def generate_preferences(pref_decls):
                 relation = LESS_EQUAL
         if relation != NO_RELATION:
             sentence_symbol1 = match.group(1)
+            if sentence_symbol1 not in assumption_symbols:
+                raise InvalidPreferenceDeclarationException("Preferences can only be defined for assumptions!")
             sentence1 = Sentence(sentence_symbol1, False)
+
             sentence_symbol2 = match.group(2)
+            if sentence_symbol2 not in assumption_symbols:
+                raise InvalidPreferenceDeclarationException("Preferences can only be defined for assumptions!")
             sentence2 = Sentence(sentence_symbol2, False)
+
             preferences.add(Preference(sentence1, sentence2, relation))
 
     return preferences
@@ -145,3 +144,15 @@ def translate_symbol(symbol, map):
         return Sentence(map[symbol], True)
     else:
         return Sentence(symbol, False)
+
+class InvalidContraryDeclarationException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+class DuplicateSymbolException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+class InvalidPreferenceDeclarationException(Exception):
+    def __init__(self, message):
+        self.message = message
