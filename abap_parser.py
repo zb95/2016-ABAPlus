@@ -24,15 +24,8 @@ def generate_aba_plus_framework_from_file(filename):
     return generate_aba_plus_framework(input)
 
 def generate_aba_plus_framework(input_string):
-    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    print(input_string)
-    print(input_string.count("\r"))
-    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     input = input_string.replace('\r', '')
     input = input.replace('\n', '')
-    #input = input_string.split("\n")
-    #input = ''.join(input)
-    print(input)
     declarations = input.split(".")
 
 
@@ -65,58 +58,6 @@ def generate_assumptions(assump_decls):
 
     return assumptions
 
-'''
-def generate_contraries_map(contr_decls):
-    #maps symbols to contraries
-    map = {}
-    duplicate_symbols = set()
-    aux_rules = set()
-
-    for decl in contr_decls:
-        cleaned_decl = decl.replace(" ", "")
-        match = re.match(CONTR_REGEX, cleaned_decl)
-        if match:
-            sentence = match.group(1)
-            contrary = match.group(2)
-
-            if (contrary in map) and (map[contrary] != DUPLICATE_USE_FOUND):
-                print("1")
-                duplicate_symbols.add(sentence)
-                duplicate_symbols.add(contrary)
-                existing_sentence = map[contrary]
-                duplicate_symbols.add(existing_sentence)
-                map[contrary] = DUPLICATE_USE_FOUND
-                aux_rules.add(Rule({Sentence(contrary, False)},
-                              Sentence(existing_sentence, True)))
-
-            if sentence in map.values():
-                print("2")
-                existing_contrary = list(map)[list(map.values()).index(sentence)]
-                if map[existing_contrary] != DUPLICATE_USE_FOUND:
-                    duplicate_symbols.add(sentence)
-                    duplicate_symbols.add(contrary)
-                    map[existing_contrary] = DUPLICATE_USE_FOUND
-                    duplicate_symbols.add(existing_contrary)
-                    aux_rules.add(Rule({Sentence(existing_contrary, False)},
-                                  Sentence(sentence, True)))
-
-            #if ((contrary in map) and (map[contrary] == DUPLICATE_USE_FOUND)) \
-            #        or (sentence in duplicate_sentences):
-            if (sentence in duplicate_symbols) or (contrary in duplicate_symbols):
-                print("3")
-                map[contrary] = DUPLICATE_USE_FOUND
-                duplicate_symbols.add(contrary)
-                duplicate_symbols.add(sentence)
-                aux_rules.add(Rule({Sentence(contrary, False)},
-                              Sentence(sentence, True)))
-            else:
-                print("4")
-                map[contrary] = sentence
-
-    return (map, aux_rules)
-'''
-
-# TODO: check that only assumptions have contraries
 def generate_contraries_map(contr_decls, assumptions):
     # maps symbols to contraries
     map = {}
