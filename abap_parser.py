@@ -18,12 +18,20 @@ LE_REGEX = r"myPrefLE\((.+),(.+)\)"
 DUPLICATE_USE_FOUND = "_duplicate"
 
 def generate_aba_plus_framework_from_file(filename):
+    """
+    :param filename: name of the file definining an ABA+ framework
+    :return: ABA_Plus object generated from file
+    """
     file = open(filename, 'r')
     input = file.read()
     file.close()
     return generate_aba_plus_framework(input)
 
 def generate_aba_plus_framework(input_string):
+    """
+    :param filename: name of the file definining an ABA+ framework
+    :return: an ABA_Plus object generated from file
+    """
     input = input_string.replace('\r', '')
     input = input.replace('\n', '')
     declarations = input.split(".")
@@ -33,12 +41,10 @@ def generate_aba_plus_framework(input_string):
     assumptions = generate_assumptions(assump_declarations)
 
     contr_declarations = [decl for decl in declarations if CONTR_PREDICATE in decl]
-    res = generate_contraries_map(contr_declarations, assumptions)
-    contr_map = res[0]
-    aux_rules = res[1]
+    contr_map = generate_contraries_map(contr_declarations, assumptions)
 
     rule_declarations = [decl for decl in declarations if RULE_PREDICATE in decl]
-    rules = generate_rules(rule_declarations, contr_map, aux_rules)
+    rules = generate_rules(rule_declarations, contr_map)
 
     pref_declarations = [decl for decl in declarations if (LT_PREDICATE in decl) or (LE_PREDICATE in decl)]
     preferences = generate_preferences(pref_declarations, assumptions)
@@ -46,6 +52,10 @@ def generate_aba_plus_framework(input_string):
     return (ABA_Plus(assumptions, preferences, rules), contr_map)
 
 def generate_assumptions(assump_decls):
+    """
+    :param assump_decls: list of assumption declarations
+    :return: set of assumptions(Sentences) generated from assumption declarations
+    """
     assumptions = set()
 
     for decl in assump_decls:
@@ -59,6 +69,11 @@ def generate_assumptions(assump_decls):
     return assumptions
 
 def generate_contraries_map(contr_decls, assumptions):
+    """
+    :param contr_decls: list of contrary declrations
+    :param assumptions: set of assumptions(Sentences)
+    :return: dictionary mapping symbols of contraries to symbols of assumptions
+    """
     # maps symbols to contraries
     map = {}
     symbols_seen = set()
@@ -85,10 +100,15 @@ def generate_contraries_map(contr_decls, assumptions):
             symbols_seen.add(sentence)
             symbols_seen.add(contrary)
 
-    return (map, set())
+    return map
 
-def generate_rules(rule_decls, map, aux_rules):
-    rules = aux_rules
+def generate_rules(rule_decls, map):
+    """
+    :param rule_decls: list of rule declarations
+    :param map: dictionary mapping symbols of contraries to symbols of assumptions
+    :return: set of Rules
+    """
+    rules = set()
 
     for decl in rule_decls:
         cleaned_decl = decl.replace(" ", "")
@@ -108,8 +128,12 @@ def generate_rules(rule_decls, map, aux_rules):
 
     return rules
 
-# TODO: check if sentences are assumptions
 def generate_preferences(pref_decls, assumptions):
+    """
+    :param pref_decls: list of preference declarations
+    :param assumptions: set of assumptions(Sentences)
+    :return: set of Preferences
+    """
     preferences = set()
     assumption_symbols = [asm.symbol for asm in assumptions]
 
@@ -140,6 +164,11 @@ def generate_preferences(pref_decls, assumptions):
     return preferences
 
 def translate_symbol(symbol, map):
+    """
+    :param symbol: symbol to translate
+    :param map: dictionary mapping symbols of contraries to symbols of assumptions
+    :return: the Sentence that the symbol is mapped to, or a new Sentence with the symbol if unmapped
+    """
     if (symbol in map) and (map[symbol] != DUPLICATE_USE_FOUND):
         return Sentence(map[symbol], True)
     else:
