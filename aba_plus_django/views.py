@@ -52,21 +52,8 @@ class IndexView(generic.ListView):
             request.session['input'] = str
 
         request.session['auto_WCP'] = False
-
-        '''
-        if "auto_WCP" in request.POST:
-            request.session['auto_WCP'] = True
-        else:
-            request.session['auto_WCP'] = False
-
-        try:
-            request.session['abap'] = generate_aba_plus_framework(self.request.session['input'])
-        except CyclicPreferenceException:
-            return render(self.request, template_name='aba_plus_django/error_msg.html', context={'message': 'Cycle in preferences detected!'})
-        else:
-            return HttpResponseRedirect(reverse('aba_plus_django:results'))
-        '''
         request.session['to_compute'] = True
+
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
 class ResultsView(generic.ListView):
@@ -320,11 +307,6 @@ def generate_json(deductions, attacks, highlighted_sentences):
     for ded in deductions:
         if ded.premise not in support_sets:
             support_sets.append(ded.premise)
-
-            '''
-            group = 2 if not (highlighted_sentences is None) \
-                         and frozenset(ded.premise).issubset(highlighted_sentences) else 1
-             '''
 
             if not(highlighted_sentences is None):
                 group = HIGHLIGHTED if frozenset(ded.premise).issubset(highlighted_sentences) else NOT_HIGHLIGHTED2
