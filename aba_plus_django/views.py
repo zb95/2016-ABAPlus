@@ -216,6 +216,11 @@ class ResultsView(generic.ListView):
 
 
 def sets_to_str(sets, contr_map={}):
+    """
+    :param sets: set of sets of Sentences to format
+    :param contr_map: dictionary mapping symbols of contraries to symbols of assumptions (default empty)
+    :return: formatted string representation of sets
+    """
     str = ""
 
     it = iter(sets)
@@ -229,6 +234,11 @@ def sets_to_str(sets, contr_map={}):
     return str
 
 def set_to_str(set, contr_map={}):
+    """
+    :param set: set of Sentences to format
+    :param contr_map: dictionary mapping symbols of contraries to symbols of assumptions (default empty)
+    :return: formatted string representation of sets
+    """
     str = "{"
 
     it = iter(set)
@@ -244,6 +254,11 @@ def set_to_str(set, contr_map={}):
     return str
 
 def sentence_to_str(sentence, contr_map={}):
+    """
+    :param sentence: Sentence to format
+    :param contr_map: dictionary mapping symbols of contraries to symbols of assumptions (default empty)
+    :return: formatted string representation of sentence
+    """
     if sentence.is_contrary:
         if sentence.symbol in contr_map:
             return contr_map[sentence.symbol]
