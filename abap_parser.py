@@ -20,7 +20,9 @@ DUPLICATE_USE_FOUND = "_duplicate"
 def generate_aba_plus_framework_from_file(filename):
     """
     :param filename: name of the file definining an ABA+ framework
-    :return: ABA_Plus object generated from file
+    :return: tuple with two elements:
+             1: ABA_Plus object generated from file
+             2: dictionary mapping symbols of contraries to symbols of assumptions
     """
     file = open(filename, 'r')
     input = file.read()
@@ -30,7 +32,9 @@ def generate_aba_plus_framework_from_file(filename):
 def generate_aba_plus_framework(input_string):
     """
     :param filename: name of the file definining an ABA+ framework
-    :return: an ABA_Plus object generated from file
+    :return: tuple with two elements:
+             1: ABA_Plus object generated from file
+             2: dictionary mapping symbols of contraries to symbols of assumptions
     """
     input = input_string.replace('\r', '')
     input = input.replace('\n', '')
