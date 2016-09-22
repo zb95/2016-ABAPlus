@@ -267,6 +267,13 @@ def sentence_to_str(sentence, contr_map={}):
         return sentence.symbol
 
 def set_atk_to_str(atk):
+    """
+    :param atk: tuple with 3 elements representing an attack between 2 sets:
+                1: attacking set of Sentences
+                2: attack type
+                3: attacked set of Sentences
+    :return: formatted string representation of atk
+    """
     str = ""
 
     type = atk[2]
@@ -281,7 +288,12 @@ def set_atk_to_str(atk):
 
     return str
 
-def arguments_extensions_to_str_list(extensions_dict, contr_map):
+def arguments_extensions_to_str_list(extensions_dict, contr_map={}):
+    """
+    :param extensions_dict: dictionary mapping sets to their conclusions
+    :param contr_map: dictionary mapping symbols of contraries to symbols of assumptions (default empty)
+    :return: list of formatted arguments(deductions)
+    """
     res = []
 
     for extension, conclusions in extensions_dict.items():
@@ -289,7 +301,13 @@ def arguments_extensions_to_str_list(extensions_dict, contr_map):
 
     return res
 
-def argument_to_str(premise, conclusion, contr_map):
+def argument_to_str(premise, conclusion, contr_map={}):
+    """
+    :param premise: set of Sentences representing the premise
+    :param conclusion: set of Sentences representing the conclusion
+    :param contr_map: dictionary mapping symbols of contraries to symbols of assumptions (default empty)
+    :return: formatted argument(deduction)
+    """
     str = ""
     str += set_to_str(premise)
     str += " {} ".format(TURNSTILE)
@@ -297,6 +315,11 @@ def argument_to_str(premise, conclusion, contr_map):
     return str
 
 def rules_to_str(rules, contr_map):
+    """
+    :param rules: collection of Rules to format
+    :param contr_map: dictionary mapping symbols of contraries to symbols of assumptions (default empty)
+    :return: formatted string representation of rules
+    """
     str = ""
 
     for rule in rules:
@@ -305,6 +328,11 @@ def rules_to_str(rules, contr_map):
     return str
 
 def rule_to_str(rule, contr_map):
+    """
+    :param rule: Rule to format
+    :param contr_map: dictionary mapping symbols of contraries to symbols of assumptions (default empty)
+    :return: formatted string representation of rule
+    """
     str = ""
 
     str += set_to_str(rule.antecedent)
@@ -316,6 +344,13 @@ def rule_to_str(rule, contr_map):
 
 
 def generate_json(deductions, attacks, highlighted_sentences):
+    """
+    generate a json file with nodes and links representing sets and attacks between them
+    :param deductions: collection of Deductions whose premises are to be represented as nodes
+    :param attacks: collection of Attacks to be represented as directed links
+    :param highlighted_sentences: collection of Sentences to be highlighted
+    :return: string containing the the json
+    """
     output = {"nodes": list(), "links": list()}
 
     support_sets = []
