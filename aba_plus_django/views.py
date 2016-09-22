@@ -80,7 +80,6 @@ class ResultsView(generic.ListView):
         context = super(generic.ListView, self).get_context_data(**kwargs)
 
         if self.request.session['to_compute']:
-            print("=====================COMPUTING RESULTS=====================")
 
             rules_added = None
             res = generate_aba_plus_framework(self.request.session['input'])
@@ -143,7 +142,6 @@ class ResultsView(generic.ListView):
             self.request.session['highlight_index'] = None
             self.request.session['compare_index'] = None
 
-            print(self.request.session.session_key)
             results[self.request.session.session_key] = {'abap': abap, 'deductions': deductions, 'attacks': attacks,
                                                          'contr_map': contr_map, 'extension_map': extension_map,
                                                          'stable_ext': stable_ext,
@@ -152,7 +150,6 @@ class ResultsView(generic.ListView):
                                                          'rules_added': rules_added}
 
         else:
-            print("=================RELOADING RESULT=====================")
             result = results[self.request.session.session_key]
 
             context['rules_added'] = result['rules_added']
@@ -170,8 +167,6 @@ class ResultsView(generic.ListView):
 
             highlighted_ext = None
             if  self.request.session['highlight_index']:
-                print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
-                print(self.request.session['highlight_index'])
                 extension_map = result['extension_map']
                 to_highlight = self.request.session['highlight_index']
                 highlighted_ext = extension_map[to_highlight][0]
@@ -184,8 +179,6 @@ class ResultsView(generic.ListView):
             context['json_input'] = generate_json(result['deductions'], result['attacks'], highlighted_ext)
 
             if self.request.session['compare_index']:
-                print("CCCCCCCCCCCCCCCCCCCCCCCCCC")
-                print(self.request.session['compare_index'])
                 extension_map = result['extension_map']
                 to_highlight = self.request.session['compare_index']
                 highlighted_ext2 = extension_map[to_highlight][0]
@@ -220,25 +213,16 @@ class ResultsView(generic.ListView):
             request.session['to_compute'] = True
             request.session['auto_WCP'] = False
 
-        print("=============POST====================")
-        if self.request.session['to_compute']:
-            print("================COMPUTE======================")
-
         if 'auto_WCP' in self.request.POST:
-            print("=========AUTO WCP=============")
             self.request.session['auto_WCP'] = True
 
         elif 'select_extension' in self.request.POST:
-            print("===============EXTENSION SELECTED==================")
             selection = request.POST['select_extension']
             self.request.session['highlight_index'] = int(selection)
-            print(self.request.session['highlight_index'])
 
         elif 'compare_extension' in self.request.POST:
-            print("===============EXTENSION COMPARED==================")
             selection = request.POST['compare_extension']
             self.request.session['compare_index'] = int(selection)
-            print(self.request.session['compare_index'])
 
         return HttpResponseRedirect(reverse('aba_plus_django:results'))
 
