@@ -67,16 +67,13 @@
 									(i.e. rules, assumptions with their contraries, and preferences among assumptions). 
 									The system then visualizes the ABA&#8314; framework, computes extensions (under various semantics) and their conclusions, 
 									at the same time allowing for a comparison between extensions. 
-
 							    <ul>
-							    An ABA&#8314; framework is specified as follows: 
-								    <li> each assumption <b>a</b> is defined via <b>myAsm(a).</b> ; </li>
-									<li> for an assumption <b>a</b>, its contrary, say <b>x</b>, is defined via <b>contrary(a</b>, <b>x).</b> ; </li>
-							        <li> each rule <b>h <- b<sub>1</sub></b>,…,<b>b<sub>n</sub></b> is defined via 
-									    <b>myRule(h</b>, <b>[b<sub>1</sub></b>,…,<b>b<sub>n</sub>]).</b> ;</li>									
-									<li> a strict (respectively, non-strict) preference <b>b < a</b> (respectively <b>b &le; a</b>) 
-								        of assumption <b>a</b> over assumption <b>b</b> is defined via <b>myPrefLT(b</b>, <b> a).</b> 
-										(respectively, <b>myPrefLE(b</b>, <b> a).</b>).</li>
+							    In ABAplus, an ABA&#8314; framework is specified as follows: 
+								    <li> <b>myAsm(a).</b> specifies that <b>a</b> is an assumption; </li>
+									<li> <b>contrary(a</b>, <b>x).</b> specifies that <b>x</b> is the contrary of assumption <b>a</b>; </li>
+							        <li> <b>myRule(h</b>, <b>[b<sub>1</sub></b>,…,<b>b<sub>n</sub>]).</b> specifies that <b>h <- b<sub>1</sub></b>,…,<b>b<sub>n</sub></b> is a rule;</li>									
+									<li> <b>myPrefLT(b</b>, <b> a).</b> specifies that assumption <b>a</b> is strictly preferred over assumption <b>b</b>; </li>
+									<li> <b>myPrefLE(b</b>, <b> a).</b> specifies that assumption <b>a</b> is strictly or equally preferred over assumption <b>b</b>.</li>
 								</ul>
 								</p>
 							</header>
