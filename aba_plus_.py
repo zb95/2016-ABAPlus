@@ -532,10 +532,21 @@ class WCPViolationException(Exception):
 
 
 def sort_sentences(list):
+    """
+    :param list: list of Sentences
+    :return: list of Sentences sorted by symbol and is_contrary
+    """
     return sorted(list, key=lambda sentence: (sentence.symbol, sentence.is_contrary))
 
 
 def convert_to_attacks_between_sets(attacks):
+    """
+    :param attacks: collection for Attacks
+    :return: set of tuples representing attacks, each with 3 elements:
+             1: premise of the attacker (set of Sentences)
+             2: premise of the attackee (set of Sentences)
+             3. attack type
+    """
     res = set()
     for atk in attacks:
         res.add((frozenset(atk.attacker.premise), frozenset(atk.attackee.premise), atk.type))
