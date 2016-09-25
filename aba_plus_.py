@@ -1,3 +1,13 @@
+"""
+This module contains a class ABA_Plus that represents an ABA+ framework as well as other classes to represent
+different components of such framework (assumptions, rules and preferences)
+
+"""
+
+__author__ = "Ziyi Bao"
+__email__ = "zb714@ic.ac.uk"
+__copyright__ = "Copyright (c) 2016 Ziyi Bao"
+
 import numpy as np
 import functools as ft
 
