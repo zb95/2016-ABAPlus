@@ -12,6 +12,11 @@ REVERSE_ATK = 2
 
 class ABA_Plus:
     def __init__(self, assumptions, preferences, rules):
+        """
+        :param assumptions: set of Sentences
+        :param preferences: set of Preferences
+        :param rules: set of Rules
+        """
         self.assumptions = assumptions
         self.preferences = preferences
         self.rules = rules
@@ -212,7 +217,7 @@ class ABA_Plus:
 
     def check_WCP(self):
         """
-        :return: True if WCP is satisfied for the frameowrk, False otherwise
+        :return: True if WCP is satisfied for the framework, False otherwise
         """
         for assump in self.assumptions:
             attacker_sets = self.generate_arguments(assump.contrary())
@@ -404,6 +409,10 @@ class ABA_Plus:
 
 class Rule:
     def __init__(self, antecedent=set(), consequent=None):
+        """
+        :param antecedent: set of Sentences
+        :param consequent: a Sentence
+        """
         self.antecedent = antecedent
         self.consequent = consequent
 
@@ -420,6 +429,10 @@ class Rule:
 
 class Sentence:
     def __init__(self, symbol=None, is_contrary=False):
+        """
+        :param symbol: string
+        :param is_contrary: boolean
+        """
         self.symbol = symbol
         self.is_contrary = is_contrary
 
@@ -438,6 +451,12 @@ class Sentence:
 
 class Preference:
     def __init__(self, assump1=None, assump2=None, relation=NO_RELATION):
+        """
+        example: Preference(a,b,LESS_THAN) represents a < b
+        :param assump1: first Sentence
+        :param assump2: second Sentence
+        :param relation: LESS_THAN, LESS_EQUAL or NO_RELATION
+        """
         self.assump1 = assump1
         self.assump2 = assump2
         self.relation = relation
@@ -455,6 +474,11 @@ class Preference:
 
 class Attack:
     def __init__(self, attacker, attackee, type):
+        """
+        :param attacker: a Deudction whose conclusion is the contrary of the premise of the attackee
+        :param attackee: a Deduction whose premise is the contrary of the conclusion of the attacker
+        :param type: NORMAL_ATK or REVERSE_ATK
+        """
         self.attacker = attacker
         self.attackee = attackee
         self.type = type
@@ -472,6 +496,10 @@ class Attack:
 
 class Deduction:
     def __init__(self, premise, conclusion):
+        """
+        :param premise: set of Deductions
+        :param conclusion: set of Deductions
+        """
         self.premise = premise
         self.conclusion = conclusion
 
@@ -513,7 +541,7 @@ def convert_to_attacks_between_sets(attacks):
         res.add((frozenset(atk.attacker.premise), frozenset(atk.attackee.premise), atk.type))
     return res
 
-### FOR DEBUGGING ###
+### USEFUL FOR DEBUGGING ###
 def print_deduction(deduction):
     print(format_deduction)
 
