@@ -1,7 +1,6 @@
 """
 This module contains a class ABA_Plus that represents an ABA+ framework as well as other classes to represent
-different components of such framework (assumptions, rules and preferences)
-
+different components of such framework (assumptions, rules and preferences).
 """
 
 __author__ = "Ziyi Bao"

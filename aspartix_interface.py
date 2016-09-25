@@ -1,4 +1,12 @@
-from aba_plus_ import *
+"""
+This module contains a class ASPARTIX_Interface that acts as an interface between an ABA_Plus object and
+ASP solvers, thus enabling the computation of extensions under various semantics.
+"""
+
+__author__ = "Ziyi Bao"
+__email__ = "zb714@ic.ac.uk"
+__copyright__ = "Copyright (c) 2016 Ziyi Bao"
+
 import subprocess
 import re
 
@@ -217,7 +225,6 @@ class ASPARTIX_Interface:
 
         """
 
-        # for python 3.5 and later:
         res = subprocess.Popen(command.format(input_filename, encoding_filename).split(" "),
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = res.stdout.read().decode("utf-8")
