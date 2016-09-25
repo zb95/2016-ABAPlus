@@ -54,35 +54,32 @@
 								<h1>Assumption-Based Argumentation with Preferences. </h1>
 								<p>
 								    This website (www-abaplus.doc.ic.ac.uk) 
-								    carries the interface of a system that implements the computational argumentation formalism ABA&#8314;
-									    <a href="https://www.dropbox.com/s/p6cndchc39yzdda/2016%20Cyras%2C%20Toni%20-%20ABA%2B.%20Assumption-Based%20Argumentation%20with%20Preferences.pdf?dl=0 ">
+								    carries the interface of <b>ABAplus</b>, a system that implements reasoning with the computational argumentation formalism ABA&#8314;
+									    <a href="http://www.aaai.org/ocs/index.php/KR/KR16/paper/view/12877/12519">
 									    (K. &#x10c;yras, F. Toni &#8211; ABA&#8314;: Assumption-Based Argumentation with Preferences</a>,  
 									<em>The 15th International Conference on Principles of Knowledge Representation and Reasoning</em> (KR 2016)).
 									ABA&#8314; is a novel approach to handling preferences in structured argumentation.
-									It is built upon the well established structured argumentation formalism, Assumption-Based Argumentation (ABA), 
-									and extends it with a binary preference relation over assumptions.
-									The preferences are incorporated directly into the attack relation and induce a mechanism to reverse attacks.
+									It extends the well established structured argumentation formalism Assumption-Based Argumentation (ABA) 
+								     with a binary preference relation over assumptions.
+									The preferences are incorporated directly into the attack relation to reverse attacks.
 								<br/><br/>
 									On this website, the users can specify the individual components of an ABA&#8314; framework 
 									(i.e. rules, assumptions with their contraries, and preferences among assumptions). 
 									The system then visualizes the ABA&#8314; framework, computes extensions (under various semantics) and their conclusions, 
 									at the same time allowing for a comparison between extensions. 
-
 							    <ul>
-							    An ABA&#8314; framework is specified as follows: 
-								    <li> each assumption <b>a</b> is defined via <b>myAsm(a).</b> ; </li>
-									<li> for an assumption <b>a</b>, its contrary, say <b>x</b>, is defined via <b>contrary(a</b>, <b>x).</b> ; </li>
-							        <li> each rule <b>h <- b<sub>1</sub></b>,…,<b>b<sub>n</sub></b> is defined via 
-									    <b>myRule(h</b>, <b>[b<sub>1</sub></b>,…,<b>b<sub>n</sub>]).</b> ;</li>									
-									<li> a strict (respectively, non-strict) preference <b>b < a</b> (respectively <b>b &le; a</b>) 
-								        of assumption <b>a</b> over assumption <b>b</b> is defined via <b>myPrefLT(b</b>, <b> a).</b> 
-										(respectively, <b>myPrefLE(b</b>, <b> a).</b>).</li>
+							    In ABAplus, an ABA&#8314; framework is specified as follows: 
+								    <li> <b>myAsm(a).</b> specifies that <b>a</b> is an assumption; </li>
+									<li> <b>contrary(a</b>, <b>x).</b> specifies that <b>x</b> is the contrary of assumption <b>a</b>; </li>
+							        <li> <b>myRule(h</b>, <b>[b<sub>1</sub></b>,…,<b>b<sub>n</sub>]).</b> specifies that <b>h <- b<sub>1</sub></b>,…,<b>b<sub>n</sub></b> is a rule;</li>									
+									<li> <b>myPrefLT(b</b>, <b> a).</b> specifies that assumption <b>a</b> is strictly preferred over assumption <b>b</b>; </li>
+									<li> <b>myPrefLE(b</b>, <b> a).</b> specifies that assumption <b>a</b> is strictly or equally preferred over assumption <b>b</b>.</li>
 								</ul>
 								</p>
 							</header>
 
                             <br/><br/>
-							Either choose file (with extension .pl) contaning the specification of an ABA&#8314; framework and <b>UPLOAD</b> <br/><br/>
+							Either choose a file (with extension .pl) contaning the specification of an ABA&#8314; framework and <b>UPLOAD</b> <br/><br/>
 
 							<form method="post" enctype="multipart/form-data">
 								{% csrf_token %}
@@ -118,7 +115,7 @@
 				<footer id="footer">
 						<div class="inner">
 							<ul class="copyright">
-								<li>&nbsp;                             &copy; Untitled. All rights reserved</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+								<li>&nbsp;                             &copy; ABAplus. All rights reserved</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
 							</ul>
 
 						</div>
