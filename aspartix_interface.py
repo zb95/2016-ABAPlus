@@ -39,6 +39,9 @@ GROUNDED_FILE = "ground.dl"
 
 class ASPARTIX_Interface:
     def __init__(self, aba_plus):
+        """
+        :param aba_plus: ABA_Plus object for which the calculation of extensions are performed
+        """
         self.aba_plus = aba_plus
 
     def generate_input_file_for_clingo(self, filename):
