@@ -1,11 +1,28 @@
+"""
+This module contains functions for generating ABA_Plus objects from files and strings.
+The Prolog-style syntax can be found under the syntax section.
+"""
+
+__author__ = "Ziyi Bao"
+__email__ = "zb714@ic.ac.uk"
+__copyright__ = "Copyright (c) 2016 Ziyi Bao"
+
 from aba_plus_ import *
 import re
 
+####### SYNTAX #######
+# myAsm(a). means "a" is an assumptions
 ASSUMP_PREDICATE = "myAsm"
+
+# contrary(a, b). means "b" is the contrary of "a"
 CONTR_PREDICATE = "contrary"
+
+# myRule(a, [b,c]). means {b,c} |- a
 RULE_PREDICATE = "myRule"
+
 # myPrefLT(a, b) represents a < b
 LT_PREDICATE = "myPrefLT"
+
 # myPrefLE(a, b) represents a <= b
 LE_PREDICATE = "myPrefLE"
 
