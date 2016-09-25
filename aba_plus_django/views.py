@@ -1,11 +1,12 @@
+__author__ = "Ziyi Bao"
+__email__ = "zb714@ic.ac.uk"
+__copyright__ = "Copyright (c) 2016 Ziyi Bao"
+
 from django.views import generic
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from django.shortcuts import render
-import requests
 import json
 
-from aba_plus_ import *
 from abap_parser import *
 from aspartix_interface import *
 
