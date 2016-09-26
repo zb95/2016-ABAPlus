@@ -1,3 +1,7 @@
+__author__ = "Ziyi Bao"
+__email__ = "zb714@ic.ac.uk"
+__copyright__ = "Copyright (c) 2016 Ziyi Bao"
+
 import unittest
 from aspartix_interface import *
 from abap_parser import *
