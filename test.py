@@ -759,6 +759,26 @@ class TestABAPlus(unittest.TestCase):
                                    Attack(ded_contr_c, ded_contr_b, REVERSE_ATK),
                                    Attack(ded_contr_c, ded_contr_b, NORMAL_ATK)})
 
+    def test_generate_all_deductions(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        e = Sentence("e")
+        f = Sentence("f")
+        g = Sentence("g")
+        assumptions = set([a, b, e])
+
+        rule1 = Rule(set([a, b]), c)
+        rule2 = Rule(set([e]), f)
+        rule3 = Rule(set([c, f]), g)
+        rules = (set([rule1, rule2, rule3]))
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
+
+        self.assertEquals(abap.generate_all_deductions({a,b,e}), {a,b,c,e,f,g})
+
+
+class TestABAPParser(unittest.TestCase):
     def test_generate_aba_plus_from_file(self):
         abap = generate_aba_plus_framework_from_file("test_generate_assumptions_from_file.pl")[0]
 
@@ -817,24 +837,6 @@ class TestABAPlus(unittest.TestCase):
         preferences = {pref1, pref2}
 
         self.assertEqual(abap.rules, rules)
-
-    def test_generate_all_deductions(self):
-        a = Sentence("a")
-        b = Sentence("b")
-        c = Sentence("c")
-        e = Sentence("e")
-        f = Sentence("f")
-        g = Sentence("g")
-        assumptions = set([a, b, e])
-
-        rule1 = Rule(set([a, b]), c)
-        rule2 = Rule(set([e]), f)
-        rule3 = Rule(set([c, f]), g)
-        rules = (set([rule1, rule2, rule3]))
-
-        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
-
-        self.assertEquals(abap.generate_all_deductions({a,b,e}), {a,b,c,e,f,g})
 
 
 class TestASPARTIXInterface(unittest.TestCase):
