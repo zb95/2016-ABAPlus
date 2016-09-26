@@ -759,6 +759,85 @@ class TestABAPlus(unittest.TestCase):
                                    Attack(ded_contr_c, ded_contr_b, REVERSE_ATK),
                                    Attack(ded_contr_c, ded_contr_b, NORMAL_ATK)})
 
+    def test_generate_aba_plus_from_file(self):
+        abap = generate_aba_plus_framework_from_file("test_generate_assumptions_from_file.pl")[0]
+
+        a = Sentence("a", False)
+        b = Sentence("b", False)
+        c = Sentence("c", False)
+        d = Sentence("d", False)
+        e = Sentence("e", False)
+        f = Sentence("f", False)
+        assumptions = {a, b, c, d, e, f}
+
+        self.assertEqual(abap.assumptions, assumptions)
+
+        p = Sentence("p", False)
+        r = Sentence("r", False)
+        s = Sentence("s", False)
+        t = Sentence("t", False)
+
+        rule1 = Rule({a, c.contrary()}, p)
+        rule2 = Rule({b, r}, a.contrary())
+        rule3 = Rule({c, s}, a.contrary())
+        rule4 = Rule({c, t}, a.contrary())
+        rule5 = Rule({a}, c.contrary())
+        rule6 = Rule(set(), s)
+        rule7 = Rule({d}, t)
+        rule8 = Rule({e}, t)
+        rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8}
+
+        self.assertEqual(abap.rules, rules)
+
+        pref1 = Preference(a, b, LESS_THAN)
+        pref2 = Preference(c, d, LESS_EQUAL)
+        preferences = {pref1, pref2}
+
+        self.assertEqual(abap.preferences, preferences)
+
+    def test_generate_aba_plus_from_file2(self):
+        abap = generate_aba_plus_framework_from_file("unit_tests_example6_input.pl")[0]
+
+        a = Sentence("a", False)
+        b = Sentence("b", False)
+        c = Sentence("c", False)
+        assumptions = {a, b, c}
+
+        self.assertEqual(abap.assumptions, assumptions)
+
+        rule1 = Rule({a, c}, b.contrary())
+        rule2 = Rule({b, c}, a.contrary())
+        rule3 = Rule({a, b}, c.contrary())
+        rules = {rule1, rule2, rule3}
+
+        self.assertEqual(abap.rules, rules)
+
+        pref1 = Preference(a, b, LESS_THAN)
+        pref2 = Preference(c, b, LESS_THAN)
+        preferences = {pref1, pref2}
+
+        self.assertEqual(abap.rules, rules)
+
+    def test_generate_all_deductions(self):
+        a = Sentence("a")
+        b = Sentence("b")
+        c = Sentence("c")
+        e = Sentence("e")
+        f = Sentence("f")
+        g = Sentence("g")
+        assumptions = set([a, b, e])
+
+        rule1 = Rule(set([a, b]), c)
+        rule2 = Rule(set([e]), f)
+        rule3 = Rule(set([c, f]), g)
+        rules = (set([rule1, rule2, rule3]))
+
+        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
+
+        self.assertEquals(abap.generate_all_deductions({a,b,e}), {a,b,c,e,f,g})
+
+
+class TestASPARTIXInterface(unittest.TestCase):
     def test_simple_calculate_admissible_extensions(self):
         a = Sentence("a")
         b = Sentence("b")
@@ -1021,84 +1100,6 @@ class TestABAPlus(unittest.TestCase):
 
         ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions6.lp")
         self.assertEqual(ideal_ext, {frozenset([b,c])})
-
-    def test_generate_aba_plus_from_file(self):
-        abap = generate_aba_plus_framework_from_file("test_generate_assumptions_from_file.pl")[0]
-
-        a = Sentence("a", False)
-        b = Sentence("b", False)
-        c = Sentence("c", False)
-        d = Sentence("d", False)
-        e = Sentence("e", False)
-        f = Sentence("f", False)
-        assumptions = {a, b, c, d, e, f}
-
-        self.assertEqual(abap.assumptions, assumptions)
-
-        p = Sentence("p", False)
-        r = Sentence("r", False)
-        s = Sentence("s", False)
-        t = Sentence("t", False)
-
-        rule1 = Rule({a, c.contrary()}, p)
-        rule2 = Rule({b, r}, a.contrary())
-        rule3 = Rule({c, s}, a.contrary())
-        rule4 = Rule({c, t}, a.contrary())
-        rule5 = Rule({a}, c.contrary())
-        rule6 = Rule(set(), s)
-        rule7 = Rule({d}, t)
-        rule8 = Rule({e}, t)
-        rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8}
-
-        self.assertEqual(abap.rules, rules)
-
-        pref1 = Preference(a, b, LESS_THAN)
-        pref2 = Preference(c, d, LESS_EQUAL)
-        preferences = {pref1, pref2}
-
-        self.assertEqual(abap.preferences, preferences)
-
-    def test_generate_aba_plus_from_file2(self):
-        abap = generate_aba_plus_framework_from_file("unit_tests_example6_input.pl")[0]
-
-        a = Sentence("a", False)
-        b = Sentence("b", False)
-        c = Sentence("c", False)
-        assumptions = {a, b, c}
-
-        self.assertEqual(abap.assumptions, assumptions)
-
-        rule1 = Rule({a, c}, b.contrary())
-        rule2 = Rule({b, c}, a.contrary())
-        rule3 = Rule({a, b}, c.contrary())
-        rules = {rule1, rule2, rule3}
-
-        self.assertEqual(abap.rules, rules)
-
-        pref1 = Preference(a, b, LESS_THAN)
-        pref2 = Preference(c, b, LESS_THAN)
-        preferences = {pref1, pref2}
-
-        self.assertEqual(abap.rules, rules)
-
-    def test_generate_all_deductions(self):
-        a = Sentence("a")
-        b = Sentence("b")
-        c = Sentence("c")
-        e = Sentence("e")
-        f = Sentence("f")
-        g = Sentence("g")
-        assumptions = set([a, b, e])
-
-        rule1 = Rule(set([a, b]), c)
-        rule2 = Rule(set([e]), f)
-        rule3 = Rule(set([c, f]), g)
-        rules = (set([rule1, rule2, rule3]))
-
-        abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
-
-        self.assertEquals(abap.generate_all_deductions({a,b,e}), {a,b,c,e,f,g})
-
 
 
 
