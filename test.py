@@ -1,5 +1,4 @@
 import unittest
-from aba_plus_ import *
 from aspartix_interface import *
 from abap_parser import *
 
@@ -975,7 +974,6 @@ class TestABAPlus(unittest.TestCase):
         asp.generate_input_file_for_clingo("test_calculate_extensions5.lp")
 
         stable_ext = asp.calculate_stable_extensions("test_calculate_extensions5.lp")
-        print(format_sets(stable_ext))
         self.assertEqual(stable_ext, {frozenset([b])})
 
         complete_ext = asp.calculate_complete_extensions("test_calculate_extensions5.lp")
@@ -1008,24 +1006,21 @@ class TestABAPlus(unittest.TestCase):
 
         asp = ASPARTIX_Interface(abap)
         asp.generate_input_file_for_clingo("test_calculate_extensions6.lp")
-        '''
-        stable_ext = asp.calculate_stable_extensions("test_calculate_extensions5.lp")
-        print(format_sets(stable_ext))
-        self.assertEqual(stable_ext, {frozenset([b])})
 
-        complete_ext = asp.calculate_complete_extensions("test_calculate_extensions5.lp")
-        self.assertEqual(complete_ext, {frozenset([b])})
+        stable_ext = asp.calculate_stable_extensions("test_calculate_extensions6.lp")
+        self.assertEqual(stable_ext, {frozenset([b,c])})
 
-        preferred_ext = asp.calculate_preferred_extensions("test_calculate_extensions5.lp")
-        self.assertEqual(preferred_ext, {frozenset([b])})
+        complete_ext = asp.calculate_complete_extensions("test_calculate_extensions6.lp")
+        self.assertEqual(complete_ext, {frozenset([b,c])})
 
-        grounded_ext = asp.calculate_grounded_extensions("test_calculate_extensions5.lp")
-        self.assertEqual(grounded_ext, {frozenset([b])})
+        preferred_ext = asp.calculate_preferred_extensions("test_calculate_extensions6.lp")
+        self.assertEqual(preferred_ext, {frozenset([b,c])})
 
-        ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions5.lp")
-        self.assertEqual(ideal_ext, {frozenset([b])})
-        '''
+        grounded_ext = asp.calculate_grounded_extensions("test_calculate_extensions6.lp")
+        self.assertEqual(grounded_ext, {frozenset([b,c])})
 
+        ideal_ext = asp.calculate_ideal_extensions("test_calculate_extensions6.lp")
+        self.assertEqual(ideal_ext, {frozenset([b,c])})
 
     def test_generate_aba_plus_from_file(self):
         abap = generate_aba_plus_framework_from_file("test_generate_assumptions_from_file.pl")[0]
@@ -1085,30 +1080,6 @@ class TestABAPlus(unittest.TestCase):
         preferences = {pref1, pref2}
 
         self.assertEqual(abap.rules, rules)
-
-    '''
-    def test_generate_aba_plus_from_file_duplicate_contraries(self):
-        abap = generate_aba_plus_framework_from_file("test_generate_aba_plus_from_file_duplicate_contraries.pl")[0]
-
-        a = Sentence("a", False)
-        b = Sentence("b", False)
-        c = Sentence("c", False)
-
-        s = Sentence("s", False)
-        t = Sentence("t", False)
-
-        rule1 = Rule({s}, a.contrary())
-        rule2 = Rule({t}, a.contrary())
-        rule3 = Rule({t}, b.contrary())
-        rule4 = Rule({c}, s)
-        rules = {rule1, rule2, rule3, rule4}
-
-        for r in abap.rules:
-            print_rule(r)
-            print()
-
-        self.assertEqual(abap.rules, rules)
-    '''
 
     def test_generate_all_deductions(self):
         a = Sentence("a")
