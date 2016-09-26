@@ -1,4 +1,7 @@
-from aba_plus_ import *
+__author__ = "Ziyi Bao"
+__email__ = "zb714@ic.ac.uk"
+__copyright__ = "Copyright (c) 2016 Ziyi Bao"
+
 from abap_parser import *
 from django.http import HttpResponse
 from django.shortcuts import render
