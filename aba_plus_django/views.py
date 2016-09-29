@@ -12,7 +12,8 @@ from aspartix_interface import *
 
 SOLVER_INPUT = "input_for_solver.lp"
 TURNSTILE = "&#x22a2;"
-ARROW = "&rarr;"
+R_ARROW = "&rarr;"
+L_ARROW = "&larr;"
 OVERLINE = "<span style=\"text-decoration: overline\">{}</span>"
 
 BOTH_ATTACKS = 3
@@ -284,7 +285,7 @@ def set_atk_to_str(atk):
         str = "Reverse Attack: "
 
     str += set_to_str(atk[0])
-    str += " {} ".format(ARROW)
+    str += " {} ".format(R_ARROW)
     str += set_to_str(atk[1])
 
     return str
@@ -336,9 +337,10 @@ def rule_to_str(rule, contr_map):
     """
     str = ""
 
-    str += set_to_str(rule.antecedent)
-    str += " {} ".format(ARROW)
     str += sentence_to_str(rule.consequent, contr_map)
+    str += " {} ".format(L_ARROW)
+    str += set_to_str(rule.antecedent)
+    
     str += "<br/>"
 
     return str
