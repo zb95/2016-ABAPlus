@@ -4,6 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static "assets/css/results.css" %}" />
     <style>
 
     .link {
@@ -28,7 +29,12 @@
     <title>Title</title>
 </head>
 <body>
-<a href="/"> Back to Home </a> <br/>
+<header id="header">
+    <a href="." class="logo">
+        <span class="symbol"><img src="{% static "images/logo.svg" %}" alt="" /></span><span class="title">ABA&#8314;</span>
+    </a>
+</header>
+
 <script src="{% static 'assets/js/d3.js' %}"></script>
 <script src="{% static 'assets/js/d3.legend.js' %}"></script>
 
@@ -562,6 +568,7 @@ if (render_graph2) {
             </td>
         </tr>
     </table>
+
 
 
     {% endautoescape %}
