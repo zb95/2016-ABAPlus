@@ -340,7 +340,7 @@ def rule_to_str(rule, contr_map):
     str += sentence_to_str(rule.consequent, contr_map)
     str += " {} ".format(L_ARROW)
     str += set_to_str(rule.antecedent)
-    
+
     str += "<br/>"
 
     return str

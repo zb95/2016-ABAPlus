@@ -28,9 +28,8 @@ body {
     margin-left: 10%;
 }
 
-th {
-    padding-left: 0px;
-    padding-right: 10px;
+table.ext th, table.ext td {
+    padding-right: 15px;
 }
 
 a {
