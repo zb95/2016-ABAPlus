@@ -17,8 +17,9 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from aba_plus import settings
 from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('aba_plus_django.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + staticfiles_urlpatterns()
