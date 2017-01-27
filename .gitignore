@@ -1,0 +1,12 @@
+# Python
+*.class
+*.pyc
+
+# Mac OSX
+.DS_Store
+
+# Emacs temp files
+*~
+
+# Unit test temp files
+/test*.lp
