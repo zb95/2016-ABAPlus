@@ -793,7 +793,7 @@ class TestABAPlus(unittest.TestCase):
 
         abap = ABA_Plus(assumptions=assumptions, rules=rules, preferences=set())
 
-        self.assertEquals(abap.generate_all_deductions({a,b,e}), {a,b,c,e,f,g})
+        self.assertEqual(abap.generate_all_deductions({a,b,e}), {a,b,c,e,f,g})
 
 
 class TestABAPParser(unittest.TestCase):
