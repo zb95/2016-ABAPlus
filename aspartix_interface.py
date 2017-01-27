@@ -134,6 +134,7 @@ class ASPARTIX_Interface:
         """
         return self.calculate_extensions(CLINGO_COMMAND, input_filename, GROUNDED_FILE, CLINGO_ANSWER, CLINGO_REGEX)
 
+    subprocess_has_run = hasattr(subprocess, 'run')
     def calculate_extensions(self, command, input_filename, encoding_filename, answer_header, regex):
         """
         :param command: command to run the desired ASP solver
@@ -145,26 +146,27 @@ class ASPARTIX_Interface:
         :return: the set of sets of Sentences(assumptions) under the semantics encoded by encoding_filename
         """
 
-        #for python 3.5 and later:
-        '''res = subprocess.run(command.format(input_filename, encoding_filename),
-                             stdout=subprocess.PIPE,
-                             universal_newlines=True)
+        if ASPARTIX_Interface.subprocess_has_run:
+            #for python 3.5 and later:
+            res = subprocess.run(command.format(input_filename, encoding_filename).split(" "),
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                 universal_newlines=True)
 
-        if answer_header not in res.stdout:
-            return set()
+            if answer_header not in res.stdout:
+                return set()
 
 
-        results = res.stdout.split(answer_header)
+            results = res.stdout.split(answer_header)
+        else:
+            res = subprocess.Popen(command.format(input_filename, encoding_filename).split(" "),
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output = res.stdout.read().decode("utf-8")
 
-        '''
-        res = subprocess.Popen(command.format(input_filename, encoding_filename).split(" "),
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output = res.stdout.read().decode("utf-8")
+            if answer_header not in output:
+                return set()
 
-        if answer_header not in output:
-            return set()
 
-        results = output.split(answer_header)
+            results = output.split(answer_header)
 
         extension_sets = set()
         answer_sets = results[1:len(results)+1]
