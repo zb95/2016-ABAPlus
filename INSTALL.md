@@ -21,8 +21,8 @@ To install numpy and django, in a terminal enter:
     sudo pip3 install numpy django
 
 To install clingo, download `https://sourceforge.net/projects/potassco/files/clingo/4.5.4/clingo-4.5.4-source.tar.gz/download` .
-In a terminal, change to the directory where you downloaded it and enter the following
-(The sed statement fixes a bug in term.cc by inserting the line '#include <cmath>'.)
+In a terminal, change to the directory where you downloaded it and enter the following.
+(The sed statement fixes a bug in term.cc by inserting the line `#include <cmath>`.)
 
     sudo apt-get install build-essential scons bison re2c
     tar xvfz clingo-4.5.4-source.tar.gz
@@ -38,7 +38,7 @@ If `<ABAPlus root>` is the path to the root of the 2016-ABAPlus distribution, in
     export PYTHONPATH=$PYTHONPATH:<ABAPlus root>
 
 You need clingo on the PATH. If `<clingo root>` is the folder of the uncompressed clingo distribution,
-either add <clingo root>/build/release to the PATH in your shell startup script, or simply enter:
+either add `<clingo root>/build/release` to the PATH in your shell startup script, or simply enter:
 
     export PATH=$PATH:<clingo root>/build/release
 
