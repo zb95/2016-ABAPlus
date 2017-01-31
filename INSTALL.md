@@ -51,11 +51,11 @@ If not, then there could be something wrong with your installation.
 
 One time only, you need to apply migrations for your Django installation. In a terminal, enter:
 
-   python3 manage.py migrate
+    python3 manage.py migrate
 
 To run the Django web server, in a terminal enter:
 
-   python3 manage.py runserver
+    python3 manage.py runserver
 
 It should print some messages including something like "Starting development server at http://127.0.0.1:8000/".
 Copy the address http://127.0.0.1:8000 and paste it into a web browser. You should see the ABA+ page.
