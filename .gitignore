@@ -10,3 +10,7 @@
 
 # Unit test temp files
 /test*.lp
+
+# Django temp files
+/db.sqlite3
+/input_for_solver.lp
