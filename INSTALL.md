@@ -21,8 +21,8 @@ To install numpy and django, in a terminal enter:
     sudo pip3 install numpy django
 
 To install clingo, download `https://sourceforge.net/projects/potassco/files/clingo/4.5.4/clingo-4.5.4-source.tar.gz/download` .
-In a terminal, change to the directory where you downloaded it and enter the following
-(The sed statement fixes a bug in term.cc by inserting the line '#include <cmath>'.)
+In a terminal, change to the directory where you downloaded it and enter the following.
+(The sed statement fixes a bug in term.cc by inserting the line `#include <cmath>`.)
 
     sudo apt-get install build-essential scons bison re2c
     tar xvfz clingo-4.5.4-source.tar.gz
@@ -38,11 +38,25 @@ If `<ABAPlus root>` is the path to the root of the 2016-ABAPlus distribution, in
     export PYTHONPATH=$PYTHONPATH:<ABAPlus root>
 
 You need clingo on the PATH. If `<clingo root>` is the folder of the uncompressed clingo distribution,
-either add <clingo root>/build/release to the PATH in your shell startup script, or simply enter:
+either add `<clingo root>/build/release` to the PATH in your shell startup script, or simply enter:
 
     export PATH=$PATH:<clingo root>/build/release
 
 To run the unit tests, in a terminal change to the directory `<ABAPlus root>` and enter:
 
     python3 -m unittest
+
+The unit tests should print a bunch of dots and a message like "Ran 47 tests in 0.113s".
+If not, then there could be something wrong with your installation.
+
+One time only, you need to apply migrations for your Django installation. In a terminal, enter:
+
+    python3 manage.py migrate
+
+To run the Django web server, in a terminal enter:
+
+    python3 manage.py runserver
+
+It should print some messages including something like "Starting development server at http://127.0.0.1:8000/".
+Copy the address http://127.0.0.1:8000 and paste it into a web browser. You should see the ABA+ page.
 
