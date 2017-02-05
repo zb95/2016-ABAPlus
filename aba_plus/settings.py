@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '^&(!%$gbdcd$0w361oyg)4ron*$hfdt-7#(46$o9!xtk$(i$dq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'www-abaplus.doc.ic.ac.uk', 'vm-www-abaplus.doc.ic.ac.uk']
 
