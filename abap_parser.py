@@ -58,7 +58,7 @@ def generate_aba_plus_framework_from_file(filename):
 
 def generate_aba_plus_framework(input_string):
     """
-    :param filename: name of the file definining an ABA+ framework
+    :param input_string: A string defining an ABA+ framework
     :return: tuple with two elements:
              1: ABA_Plus object generated from file
              2: dictionary mapping symbols of contraries to symbols of assumptions
