@@ -146,9 +146,11 @@ class ASPARTIX_Interface:
         :return: the set of sets of Sentences(assumptions) under the semantics encoded by encoding_filename
         """
 
+        args = command.format(input_filename, encoding_filename).split(" ")
+
         if ASPARTIX_Interface.subprocess_has_run:
             #for python 3.5 and later:
-            res = subprocess.run(command.format(input_filename, encoding_filename).split(" "),
+            res = subprocess.run(args,
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                  universal_newlines=True)
 
@@ -158,7 +160,7 @@ class ASPARTIX_Interface:
 
             results = res.stdout.split(answer_header)
         else:
-            res = subprocess.Popen(command.format(input_filename, encoding_filename).split(" "),
+            res = subprocess.Popen(args,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output = res.stdout.read().decode("utf-8")
 
@@ -240,7 +242,9 @@ class ASPARTIX_Interface:
 
         """
 
-        res = subprocess.Popen(command.format(input_filename, encoding_filename).split(" "),
+        args = command.format(input_filename, encoding_filename).split(" ")
+
+        res = subprocess.Popen(args,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = res.stdout.read().decode("utf-8")
 
