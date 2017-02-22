@@ -517,8 +517,8 @@ class Attack:
 class Deduction:
     def __init__(self, premise, conclusion):
         """
-        :param premise: set of Deductions
-        :param conclusion: set of Deductions
+        :param premise: set of Sentence
+        :param conclusion: set of Sentence
         """
         self.premise = premise
         self.conclusion = conclusion
