@@ -243,25 +243,41 @@ class ABA_Plus:
         for assump in self.assumptions:
             attacker_sets = self.generate_arguments(assump.contrary())
             for attacker_set in attacker_sets:
-                culprit_list = [ c for c in set(attacker_set) if self.is_preferred(assump, c)]	# get a list of "culprits" -- assumptions in attacker_set that are < assump
-                culprits = set(culprit_list) 							# put the culprit list into a set
-                minimal_culprits = self.set_of_minimal_elements(culprits) 			# get the set of <-minimal culprits
-                for attacker in minimal_culprits: 						# for every <-minimal culprit
-                    if self._WCP_fulfilled(attacker, assump, set(attacker_set)): 		# if there is a deduction required for WCP, succeed immediately
-                        return True
+                culprit_list = [ c for c in set(attacker_set) if self.is_preferred(assump, c)]	
+		# get a list of "culprits" -- assumptions in attacker_set that are < assump
+                culprits = set(culprit_list) 							
+		# put the culprit list into a set
+                minimal_culprits = self.set_of_minimal_elements(culprits) 			
+		# get the set of <-minimal culprits
+                for attacker in minimal_culprits: 						
+		# for every <-minimal culprit
+                    if self._WCP_fulfilled(attacker, assump, set(attacker_set)): 		
+			# if there is a deduction required for WCP
+                        break
+			# then break the loop
+		    else:
+			# else, if for no <-minimal cuplrit a deduction required for WCP was found,
+			return False	
+			# then WCP is not satisfied
 
-        return False 										# if for no <-minimal culprit there is a required deduction, WCP is not satisfied
+        return True 
+	# WCP is satisfied in other cases
 
     def set_of_minimal_elements(self, given_set):
         """
         :return: the set of <-minimal elements of a given set
         (helper function for the check_WCP bug fix by K. Cyras, 01/03/2017)
         """
-        minimal = set() 									# initiates minimal to be the empty set
-        for c in given_set: 									# for every element c of the given set
-                if not self.get_minimally_preferred(c, given_set): 				# if there is no element in the given set which is < c
-                        minimal.add(c) 								# then c is <-minimal, so add it to the set minimal
-        return minimal 										# returns the set of <-minimal elements of the given set
+        minimal = set() 									
+	# initiates minimal to be the empty set
+        for c in given_set: 									
+		# for every element c of the given set
+                if not self.get_minimally_preferred(c, given_set): 				
+			# if there is no element in the given set which is < c
+                        minimal.add(c) 								
+			# then c is <-minimal, so add it to the set minimal
+        return minimal 										
+	# returns the set of <-minimal elements of the given set
 
 
     def check_and_partially_satisfy_WCP(self):
