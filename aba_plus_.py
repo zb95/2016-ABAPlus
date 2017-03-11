@@ -255,9 +255,9 @@ class ABA_Plus:
 			# if there is a deduction required for WCP
                         break
 			# then break the loop
-		    else:
+                    else:
 			# else, if for no <-minimal cuplrit a deduction required for WCP was found,
-			return False	
+                        return False
 			# then WCP is not satisfied
 
         return True 
