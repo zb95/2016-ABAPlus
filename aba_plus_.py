@@ -238,31 +238,42 @@ class ABA_Plus:
     def check_WCP(self):
         """
         :return: True if WCP is satisfied for the framework, False otherwise
-        (check_WCP bug fix by K. Cyras, 01/03/2017)
         """
+        assumps = []
+        attackers_sets = []
+        attackers = []
         for assump in self.assumptions:
             attacker_sets = self.generate_arguments(assump.contrary())
             for attacker_set in attacker_sets:
-                culprit_list = [ c for c in set(attacker_set) if self.is_preferred(assump, c)]
+                culprit_list = [ c for c in set(attacker_set) if self.is_preferred(assump, c)]	
                 # get a list of "culprits" -- assumptions in attacker_set that are < assump
-                culprits = set(culprit_list)
+                culprits = set(culprit_list) 							                        
                 # put the culprit list into a set
-                minimal_culprits = self.set_of_minimal_elements(culprits)
+                minimal_culprits = self.set_of_minimal_elements(culprits) 			            
                 # get the set of <-minimal culprits
-                for attacker in minimal_culprits:
+                for attacker in minimal_culprits: 						                        
                 # for every <-minimal culprit
-                    if self._WCP_fulfilled(attacker, assump, set(attacker_set)):
-                        # if there is a deduction required for WCP
-                        break
-                        # then break the loop
-                    else:
-                        # else, if for no <-minimal cuplrit a deduction required for WCP was found,
-                        return False
-                        # then WCP is not satisfied
+                    if self._WCP_fulfilled(attacker, assump, set(attacker_set)): 		
+                    # if there is a deduction required for WCP, 
+                        attackers.append(True)
+                        # put True in the accumulator attackers
+                if minimal_culprits:
+                # if minimal_culprits is not empty
+                    attackers_sets.append(any(attackers))
+                    # put True in the accumulator attackers_sets if attackers contains True
+                    # else put False in the accumulator attackers_sets
+                    # If True is put, then this was not an instance of WCP;
+                    # else, if False is put, then this was an instance of WCP
+            assumps.append(all(attackers_sets))
+            # put True in the accumulator assumps if False is not in attackers_sets, 
+            # i.e. if there was no instance of WCP for the assumption assump
+            # else put False in the accumulator assumps, 
+            # i.e. if there was at least one instance of WCP for the assumption assump
+        return all(assumps)
+        # return True if False is not in assumps, i.e. if no instance of WCP was found
+        # return False if at least one instance of WCP was found
 
-        return True
-        # WCP is satisfied in other cases
-
+        
     def set_of_minimal_elements(self, given_set):
         """
         :return: the set of <-minimal elements of a given set
